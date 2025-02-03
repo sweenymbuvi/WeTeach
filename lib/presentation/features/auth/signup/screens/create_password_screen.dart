@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/account_profile.dart';
+import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/widgets/password_field_widget.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:provider/provider.dart';
 
 class CreatePasswordScreen extends StatefulWidget {
   final bool isFromSignup;
+  final int otp;
 
-  const CreatePasswordScreen({super.key, required this.isFromSignup});
+  const CreatePasswordScreen({
+    super.key,
+    required this.isFromSignup,
+    required this.otp,
+  });
 
   @override
   _CreatePasswordScreenState createState() => _CreatePasswordScreenState();
@@ -17,12 +25,14 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
   bool isPasswordVisible = false;
   bool isConfirmPasswordVisible = false;
 
-  final borderColor =
-      Color(0x00476be8).withOpacity(0.11); // Define the border color
+  final borderColor = Color(0x00476be8).withOpacity(0.11);
+
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    // Get screen width
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -73,6 +83,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
               ),
               SizedBox(height: 16),
               PasswordField(
+                controller: passwordController,
                 hintText: "Enter password",
                 isPasswordVisible: isPasswordVisible,
                 onToggleVisibility: () {
@@ -83,6 +94,15 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                 fillColor: Color(0xFFFDFDFF),
                 borderColor: borderColor,
               ),
+              if (passwordController.text.length > 0 &&
+                  passwordController.text.length < 8)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    "Password must be at least 8 characters long",
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
               SizedBox(height: 16),
               RichText(
                 text: TextSpan(
@@ -106,6 +126,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
               ),
               SizedBox(height: 16),
               PasswordField(
+                controller: confirmPasswordController,
                 hintText: "Repeat password",
                 isPasswordVisible: isConfirmPasswordVisible,
                 onToggleVisibility: () {
@@ -116,23 +137,60 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                 fillColor: Color(0xFFFDFDFF),
                 borderColor: borderColor,
               ),
-              SizedBox(
-                height: screenWidth *
-                    0.8, // Add extra space before the button based on screen width
-              ),
-              CustomButton(
-                text: widget.isFromSignup ? "Create Account" : "Complete",
-                onPressed: () {
-                  if (widget.isFromSignup) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AccountProfileScreen(),
-                      ),
-                    );
-                  } else {
-                    // Handle password reset completion logic
-                  }
+              SizedBox(height: screenWidth * 0.8),
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  return CustomButton(
+                    text: widget.isFromSignup ? "Create Account" : "Complete",
+                    onPressed: () async {
+                      if (passwordController.text.length < 8) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  "Password must be at least 8 characters long")),
+                        );
+                        return;
+                      }
+                      if (passwordController.text !=
+                          confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Passwords do not match")),
+                        );
+                        return;
+                      }
+
+                      bool result = await authProvider.setPassword(
+                        otpCode: widget.otp,
+                        password: passwordController.text.trim(),
+                        password2: confirmPasswordController.text.trim(),
+                      );
+
+                      if (result) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Password set successfully!'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        await Future.delayed(Duration(seconds: 2));
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => widget.isFromSignup
+                                ? AccountProfileScreen()
+                                : SignInScreen(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text(authProvider.errorMessage ?? "Error")),
+                        );
+                      }
+                    },
+                  );
                 },
               ),
             ],

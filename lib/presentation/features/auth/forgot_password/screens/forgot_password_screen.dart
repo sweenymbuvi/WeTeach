@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -14,14 +16,43 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   TextEditingController emailController = TextEditingController();
 
-  void onRequestCodeClick() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OtpVerificationScreen(
-            isFromSignIn: false, isFromRecoverPassword: true),
-      ),
-    );
+  void onRequestCodeClick() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter your email.")),
+      );
+      return;
+    }
+
+    // Call the sendOtpForPasswordReset method
+    final success = await Provider.of<AuthProvider>(context, listen: false)
+        .sendOtpForPasswordReset(email: email);
+
+    if (success) {
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("OTP sent to your email.")),
+      );
+
+      // Navigate to the OTP verification screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpVerificationScreen(
+            isFromSignIn: false,
+            isFromRecoverPassword: true,
+          ),
+        ),
+      );
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                "Failed to send OTP: ${Provider.of<AuthProvider>(context, listen: false).errorMessage}")),
+      );
+    }
   }
 
   @override
@@ -99,7 +130,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           height: 5, width: 5, fit: BoxFit.scaleDown),
                       fillColor: Color(0xFFFDFDFF),
                       filled: true,
-                      // Set border color for all states (enabled, focused, etc.)
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(

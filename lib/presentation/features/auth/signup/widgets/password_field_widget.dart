@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class PasswordField extends StatelessWidget {
+  final TextEditingController
+      controller; // Still using controller for text input
   final String hintText;
   final bool isPasswordVisible;
   final VoidCallback onToggleVisibility;
@@ -10,6 +12,7 @@ class PasswordField extends StatelessWidget {
 
   const PasswordField({
     super.key,
+    required this.controller, // Controller to manage text input
     required this.hintText,
     required this.isPasswordVisible,
     required this.onToggleVisibility,
@@ -20,7 +23,8 @@ class PasswordField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      obscureText: !isPasswordVisible,
+      controller: controller, // Bind controller to the text field
+      obscureText: !isPasswordVisible, // Handle visibility of the password
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(

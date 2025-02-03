@@ -15,19 +15,26 @@ class _ProfilePopupState extends State<ProfilePopup> {
   @override
   void initState() {
     super.initState();
-    // Show the popup automatically when the page loads
+    // Show the bottom sheet automatically when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showPopupDialog();
+      _showBottomSheet();
     });
   }
 
-  void _showPopupDialog() {
-    showDialog(
+  void _showBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      barrierDismissible:
-          false, // Prevent dismissing the popup by tapping outside
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      isScrollControlled: true, // Make the sheet height customizable
+      backgroundColor: Colors
+          .transparent, // Make the background transparent to show the custom design
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -107,7 +114,7 @@ class _ProfilePopupState extends State<ProfilePopup> {
                     text: 'Go Live',
                     onPressed: () {
                       // Add your action here
-                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context); // Close the bottom sheet
                     },
                   ),
                   SizedBox(height: 10),
@@ -117,7 +124,7 @@ class _ProfilePopupState extends State<ProfilePopup> {
                     text: 'Preview your Profile',
                     onPressed: () {
                       // Add your action here
-                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context); // Close the bottom sheet
                     },
                     isOutlined: false,
                   ),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/forgot_password/screens/forgot_password_screen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_number.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -16,11 +17,23 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool _obscurePassword = true;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider =
+        Provider.of<AuthProvider>(context); // Access the AuthProvider
+
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -73,6 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.02),
                         TextField(
+                          controller: _emailController, // Add controller
                           decoration: InputDecoration(
                             hintText: "Enter email",
                             hintStyle: TextStyle(color: Color(0xFF828282)),
@@ -131,6 +145,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.02),
                         TextField(
+                          controller: _passwordController, // Add controller
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: "Enter password",
@@ -186,10 +201,11 @@ class _SignInScreenState extends State<SignInScreen> {
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ForgotPasswordScreen()));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgotPasswordScreen(),
+                                ),
+                              );
                             },
                             child: Text(
                               "Forgot password?",
@@ -204,18 +220,51 @@ class _SignInScreenState extends State<SignInScreen> {
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.1),
                         CustomButton(
-                          text: 'Sign In',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => OtpVerificationScreen(
-                                    isFromSignIn: true,
-                                    isFromRecoverPassword: false,
-                                    isFromSignupWithEmail: true),
-                              ),
-                            );
-                          },
+                          text: authProvider.isLoading
+                              ? 'Signing In...'
+                              : 'Sign In',
+                          onPressed: !authProvider.isLoading
+                              ? () async {
+                                  final email = _emailController.text.trim();
+                                  final password =
+                                      _passwordController.text.trim();
+
+                                  if (email.isEmpty || password.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text("Please fill in all fields."),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  final success = await authProvider.signIn(
+                                    email: email,
+                                    password: password,
+                                  );
+
+                                  if (success) {
+                                    // Show success message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Sign In successful!"),
+                                      ),
+                                    );
+                                    _emailController.clear();
+                                    _passwordController.clear();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          authProvider.errorMessage ??
+                                              "Sign-in failed.",
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null, // Disable the button when loading
                         ),
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.03),
@@ -225,8 +274,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        CreateAccountScreen()),
+                                  builder: (context) => CreateAccountScreen(),
+                                ),
                               );
                             },
                             child: Text.rich(
@@ -290,12 +339,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                       MediaQuery.of(context).size.width * 0.03),
                               ElevatedButton.icon(
                                 onPressed: () {
-                                  // Handle "Continue with Phone Number"
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              SignInNumberScreen()));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          SignInNumberScreen(),
+                                    ),
+                                  );
                                 },
                                 icon: Icon(
                                   Icons.phone,
@@ -335,8 +385,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                 label: Text(
                                   "Continue with Google",
                                   style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,

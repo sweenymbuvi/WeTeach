@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_qualifications.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
+import 'dart:io'; // Import for File
 
 class ProfilePhotoAddedScreen extends StatelessWidget {
-  const ProfilePhotoAddedScreen({super.key});
+  final String imagePath; // Add a field to hold the image path
+
+  const ProfilePhotoAddedScreen(
+      {super.key, required this.imagePath}); // Update constructor
 
   @override
   Widget build(BuildContext context) {
-    // Get screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
-    // You can manage _currentPage in a StatefulWidget or with a PageController
-    int currentPage = 1;
 
     return Scaffold(
       appBar: AppBar(
@@ -38,10 +41,9 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
                   width: screenWidth * 0.025,
                   height: screenWidth * 0.025,
                   decoration: BoxDecoration(
-                    color:
-                        index <= currentPage // Fill bubbles for index 0 and 1
-                            ? const Color(0xFFAC00E6)
-                            : const Color(0xFFF0F0F0),
+                    color: index <= 1 // Fill bubbles for index 0 and 1
+                        ? const Color(0xFFAC00E6)
+                        : const Color(0xFFF0F0F0),
                     shape: BoxShape.circle,
                   ),
                 );
@@ -50,15 +52,12 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
           ),
         ],
       ),
-      backgroundColor: Colors.white, // Ensure the background is white
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal:
-                screenWidth * 0.04), // Adjust padding based on screen width
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Skip Button in One Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -71,11 +70,12 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    // Handle skip logic here
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => QualificationsScreen()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QualificationsScreen(),
+                      ),
+                    );
                   },
                   child: Text(
                     "Skip",
@@ -88,34 +88,27 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.06), // Adjusted spacing
-            SizedBox(height: screenHeight * 0.06), // Adjusted spacing
-
+            SizedBox(height: screenHeight * 0.06),
             Center(
               child: Column(
                 children: [
-                  // Circle Avatar for Profile Photo
                   CircleAvatar(
-                    radius: 40, // Keep original size
+                    radius: 40,
                     backgroundColor: Color(0xFFFDFDFF),
-                    backgroundImage: AssetImage(
-                        'assets/images/man.png'), // Replace with your image path
+                    backgroundImage: FileImage(File(
+                        imagePath)), // Use FileImage to display the selected image
                   ),
-                  SizedBox(height: screenHeight * 0.01), // Adjusted spacing
-
-                  // Row with SVG Icon and Text
+                  SizedBox(height: screenHeight * 0.01),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SvgPicture.asset(
-                        'assets/svg/tick.svg', // Replace with your SVG asset path
+                        'assets/svg/tick.svg',
                         height: 16,
                         width: 16,
                         fit: BoxFit.scaleDown,
                       ),
-                      SizedBox(
-                          width: screenWidth *
-                              0.02), // Spacing between icon and text
+                      SizedBox(width: screenWidth * 0.02),
                       Text(
                         "Photo Added",
                         style: GoogleFonts.inter(
@@ -133,25 +126,50 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
             Column(
               children: [
                 CustomButton(
-                    text: 'Proceed',
-                    onPressed: () {
+                  text: 'Proceed',
+                  onPressed: () async {
+                    // Call the AuthProvider to update the profile with the image
+                    final authProvider =
+                        Provider.of<AuthProvider>(context, listen: false);
+                    bool success = await authProvider.updateTeacherProfile(
+                      userId: authProvider
+                          .userId!, // Assuming userId is available in AuthProvider
+                      image: imagePath, // Pass the selected image path
+                    );
+
+                    if (success) {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => QualificationsScreen()));
-                    }),
-                SizedBox(height: screenHeight * 0.02), // Adjusted spacing
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QualificationsScreen(),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Failed to update profile photo.')),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(height: screenHeight * 0.02),
                 ProfileButton(
                   onPressed: () {
                     // Handle "Change Profile Photo" action here
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddProfilePhotoScreen(),
+                      ),
+                    );
                   },
                   text: "Change Profile Photo",
-                  icon: null, // No icon for this button
+                  icon: null,
                   isOutlined: false,
                 ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.04), // Adjusted bottom spacing
+            SizedBox(height: screenHeight * 0.04),
           ],
         ),
       ),

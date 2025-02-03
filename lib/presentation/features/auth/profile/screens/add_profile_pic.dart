@@ -1,20 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // Import the flutter_svg package
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart'; // Import the image_picker package
 import 'package:we_teach/presentation/features/auth/profile/screens/add_qualifications.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/added_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
+import 'dart:io'; // Import for File
 
 class AddProfilePhotoScreen extends StatelessWidget {
   const AddProfilePhotoScreen({super.key});
 
+  Future<void> _pickImage(BuildContext context) async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      // If an image is selected, navigate to the ProfilePhotoAddedScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePhotoAddedScreen(
+              imagePath: image.path), // Pass the image path
+        ),
+      );
+    }
+  }
+
+  Future<void> _takePhoto(BuildContext context) async {
+    // Initialize the ImagePicker
+    final ImagePicker _picker = ImagePicker();
+
+    // Open the camera and allow the user to take a photo
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    // Check if the user took a photo
+    if (image != null) {
+      // Navigate to the next screen and pass the image path
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePhotoAddedScreen(
+            imagePath: image.path, // Pass the image path to the next screen
+          ),
+        ),
+      );
+    } else {
+      // Handle the case where the user didn't take a photo
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No photo was taken.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // You can manage _currentPage in a StatefulWidget or with a PageController
     int currentPage = 1;
 
     return Scaffold(
@@ -38,10 +80,9 @@ class AddProfilePhotoScreen extends StatelessWidget {
                   width: screenWidth * 0.025,
                   height: screenWidth * 0.025,
                   decoration: BoxDecoration(
-                    color:
-                        index <= currentPage // Fill bubbles for index 0 and 1
-                            ? const Color(0xFFAC00E6)
-                            : const Color(0xFFF0F0F0),
+                    color: index <= currentPage
+                        ? const Color(0xFFAC00E6)
+                        : const Color(0xFFF0F0F0),
                     shape: BoxShape.circle,
                   ),
                 );
@@ -50,15 +91,12 @@ class AddProfilePhotoScreen extends StatelessWidget {
           ),
         ],
       ),
-      backgroundColor: Colors.white, // Ensure the background is white
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal:
-                screenWidth * 0.04), // Adjust padding based on screen width
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Skip Button in One Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -71,11 +109,12 @@ class AddProfilePhotoScreen extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    // Handle skip logic here
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => QualificationsScreen()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QualificationsScreen(),
+                      ),
+                    );
                   },
                   child: Text(
                     "Skip",
@@ -88,40 +127,35 @@ class AddProfilePhotoScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.06), // Adjusted spacing
-            SizedBox(height: screenHeight * 0.06), // Adjusted spacing
-
+            SizedBox(height: screenHeight * 0.06),
             Center(
               child: Column(
                 children: [
-                  // Container with the SVG icon
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      // SVG Icon Asset
                       SvgPicture.asset(
                         'assets/svg/circle.svg',
-                        height: 100, // Keep original size
-                        width: 100, // Keep original size
+                        height: 100,
+                        width: 100,
                         fit: BoxFit.scaleDown,
                       ),
-                      // CircleAvatar inside the SVG icon (moved up a little)
                       Positioned(
-                        top: screenHeight * 0.02, // Moves the avatar up
+                        top: screenHeight * 0.02,
                         child: CircleAvatar(
-                          radius: 40, // Keep original size
+                          radius: 40,
                           backgroundColor: Color(0xFFFDFDFF),
                           child: SvgPicture.asset(
                             'assets/svg/photo.svg',
-                            height: 25, // Keep original size
-                            width: 25, // Keep original size
+                            height: 25,
+                            width: 25,
                             fit: BoxFit.scaleDown,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: screenHeight * 0.02), // Adjusted spacing
+                  SizedBox(height: screenHeight * 0.02),
                   Text(
                     "Passport size photo (Max size: 5mb)",
                     style: GoogleFonts.inter(
@@ -146,41 +180,29 @@ class AddProfilePhotoScreen extends StatelessWidget {
               children: [
                 ProfileButton(
                   onPressed: () {
-                    // Handle "Select from Gallery" action here
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfilePhotoAddedScreen(),
-                      ),
-                    );
+                    _pickImage(context); // Call the method to pick an image
                   },
                   text: "Select from Gallery",
                   icon: SvgPicture.asset(
                     'assets/svg/image.svg',
-                    height: 24, // Keep original size
-                    width: 24, // Keep original size
+                    height: 24,
+                    width: 24,
                     fit: BoxFit.scaleDown,
                   ),
                   isOutlined: true,
                 ),
-                SizedBox(height: screenHeight * 0.02), // Adjusted spacing
+                SizedBox(height: screenHeight * 0.02),
                 ProfileButton(
                   onPressed: () {
-                    // Handle "Take new Photo" action here
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfilePhotoAddedScreen(),
-                      ),
-                    );
+                    _takePhoto(context); // Call the method to take a new photo
                   },
                   text: "Take new Photo",
-                  icon: null, // No icon for this button
+                  icon: null,
                   isOutlined: false,
                 ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.04), // Adjusted bottom spacing
+            SizedBox(height: screenHeight * 0.04),
           ],
         ),
       ),

@@ -4,9 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/forgot_password/screens/forgot_password_screen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class SignInNumberScreen extends StatefulWidget {
   const SignInNumberScreen({super.key});
@@ -17,11 +18,23 @@ class SignInNumberScreen extends StatefulWidget {
 
 class _SignInNumberScreenState extends State<SignInNumberScreen> {
   bool _obscurePassword = true;
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String _completePhoneNumber = '';
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -74,6 +87,7 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.02),
                         IntlPhoneField(
+                          controller: _phoneController,
                           decoration: InputDecoration(
                             hintText: "712345678",
                             hintStyle: GoogleFonts.inter(
@@ -107,7 +121,8 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
                           ),
                           initialCountryCode: 'KE',
                           onChanged: (phone) {
-                            print(phone.completeNumber);
+                            // Store the complete phone number
+                            _completePhoneNumber = phone.completeNumber;
                           },
                           disableLengthCheck: true,
                         ),
@@ -135,6 +150,7 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.02),
                         TextField(
+                          controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: "Enter password",
@@ -208,18 +224,52 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.1),
                         CustomButton(
-                          text: 'Sign In',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => OtpVerificationScreen(
-                                    isFromSignIn: true,
-                                    isFromRecoverPassword: false,
-                                    isFromSignupWithEmail: false),
-                              ),
-                            );
-                          },
+                          text: authProvider.isLoading
+                              ? 'Signing In...'
+                              : 'Sign In',
+                          onPressed: !authProvider.isLoading
+                              ? () async {
+                                  final password =
+                                      _passwordController.text.trim();
+
+                                  if (_completePhoneNumber.isEmpty ||
+                                      password.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text("Please fill in all fields."),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  final success =
+                                      await authProvider.signInWithPhoneNumber(
+                                    phoneNumber: _completePhoneNumber,
+                                    password: password,
+                                  );
+
+                                  if (success) {
+                                    // Show success message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Sign In successful!"),
+                                      ),
+                                    );
+                                    _phoneController.clear();
+                                    _passwordController.clear();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          authProvider.errorMessage ??
+                                              "Sign-in failed.",
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null,
                         ),
                         SizedBox(
                             height: MediaQuery.of(context).size.width * 0.03),

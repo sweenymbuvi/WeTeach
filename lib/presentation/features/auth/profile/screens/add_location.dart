@@ -1,7 +1,11 @@
+import 'dart:async'; // Import this for Future
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart'; // Import this for Provider
+import 'package:we_teach/data/repositories/auth/auth_repo.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/finished_profile.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 
 class AddLocationScreen extends StatefulWidget {
@@ -14,21 +18,66 @@ class AddLocationScreen extends StatefulWidget {
 class _AddLocationScreenState extends State<AddLocationScreen> {
   String? selectedCounty;
   String? selectedSubCounty;
+  Map<String, String> counties = {}; // Use a map to store county names and IDs
+  Map<String, String> subCountyIds =
+      {}; // Map to store sub-county names and IDs
 
-  final List<String> counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru'];
-  final Map<String, List<String>> subCounties = {
-    'Nairobi': ['Westlands', 'Langata', 'Kasarani', 'Embakasi'],
-    'Mombasa': ['Kisauni', 'Likoni', 'Nyali', 'Changamwe'],
-    'Kisumu': ['Kisumu West', 'Kisumu East', 'Nyando', 'Muhoroni'],
-    'Nakuru': ['Naivasha', 'Njoro', 'Nakuru East', 'Rongai'],
-  };
+  @override
+  void initState() {
+    super.initState();
+    _loadCounties(); // Load counties when the widget is initialized
+  }
+
+  Future<void> _loadCounties() async {
+    try {
+      // Fetch counties from the AuthProvider
+      final accessToken =
+          Provider.of<AuthProvider>(context, listen: false).accessToken;
+      List<Map<String, String>> fetchedCounties =
+          await AuthRepository.fetchCounties(accessToken!);
+      setState(() {
+        counties = Map.fromIterable(
+          fetchedCounties,
+          key: (county) => county['name'], // Use county name as the key
+          value: (county) => county['id'], // Use county ID as the value
+        ); // Update the counties map
+      });
+    } catch (e) {
+      // Handle any errors that occur during fetching
+      print("Error fetching counties: $e");
+    }
+  }
+
+  Future<void> _loadSubCounties(String countyId) async {
+    try {
+      // Fetch the access token
+      final accessToken =
+          Provider.of<AuthProvider>(context, listen: false).accessToken;
+
+      // Fetch sub-counties based on the selected county
+      List<Map<String, String>> fetchedSubCounties =
+          await AuthRepository.fetchSubCounties(countyId, accessToken!);
+      setState(() {
+        subCountyIds = Map.fromIterable(
+          fetchedSubCounties,
+          key: (subCounty) =>
+              subCounty['name'], // Use sub-county name as the key
+          value: (subCounty) =>
+              subCounty['id'], // Use sub-county ID as the value
+        ); // Update the sub-county IDs map
+      });
+    } catch (e) {
+      // Handle any errors that occur during fetching
+      print("Error fetching sub-counties: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    int currentPage = 3;
+    final authProvider =
+        Provider.of<AuthProvider>(context); // Access the auth provider
+    final userId =
+        authProvider.userId; // Get the user ID from the auth provider
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -39,29 +88,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(
-              right: screenWidth * 0.04,
-              top: screenHeight * 0.02,
-            ),
-            child: Row(
-              children: List.generate(4, (index) {
-                return Container(
-                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
-                  width: screenWidth * 0.025,
-                  height: screenWidth * 0.025,
-                  decoration: BoxDecoration(
-                    color: index <= currentPage
-                        ? const Color(0xFFAC00E6)
-                        : const Color(0xFFF0F0F0),
-                    shape: BoxShape.circle,
-                  ),
-                );
-              }),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -135,14 +161,19 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                 ),
               ),
               value: selectedCounty,
-              items: counties
+              items: counties.keys
                   .map((county) =>
                       DropdownMenuItem(value: county, child: Text(county)))
                   .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedCounty = value;
-                  selectedSubCounty = null;
+                  selectedSubCounty = null; // Reset sub-county selection
+                  if (value != null) {
+                    // Load sub-counties when a county is selected
+                    String countyId = counties[value]!; // Get the county ID
+                    _loadSubCounties(countyId); // Pass the county ID
+                  }
                 });
               },
             ),
@@ -204,12 +235,10 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                 ),
               ),
               value: selectedSubCounty,
-              items: selectedCounty != null
-                  ? subCounties[selectedCounty]!
-                      .map((subCounty) => DropdownMenuItem(
-                          value: subCounty, child: Text(subCounty)))
-                      .toList()
-                  : [],
+              items: subCountyIds.keys // Use the map of sub-county IDs
+                  .map((subCounty) => DropdownMenuItem(
+                      value: subCounty, child: Text(subCounty)))
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedSubCounty = value;
@@ -218,13 +247,57 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
             ),
             Spacer(),
             CustomButton(
-                text: 'Continue',
-                onPressed: () {
-                  Navigator.push(
+              text: 'Continue',
+              onPressed: () async {
+                if (selectedCounty != null && selectedSubCounty != null) {
+                  // Get the IDs of the selected county and sub-county
+                  String countyId =
+                      counties[selectedCounty]!; // This is a String
+                  String subCountyId =
+                      subCountyIds[selectedSubCounty]!; // Get the sub-county ID
+
+                  // Convert countyId and subCountyId to integers
+                  int countyIdInt = int.parse(countyId); // Convert to int
+                  int subCountyIdInt = int.parse(subCountyId); // Convert to int
+
+                  // Assuming you have the userId available
+                  int userId = authProvider
+                      .userId!; // Get the user ID from the auth provider
+
+                  // Call the updateTeacherProfile method
+                  final success = await Provider.of<AuthProvider>(context,
+                          listen: false)
+                      .updateTeacherProfile(
+                          userId: userId, // Pass the user ID
+                          county: countyIdInt, // Pass the county ID
+                          subCounty: subCountyIdInt // Pass the sub-county ID
+                          );
+
+                  if (success) {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ProfileCompleteScreen()));
-                }),
+                        builder: (context) => const ProfileCompleteScreen(),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text("Failed to update county and sub-county."),
+                      ),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text("Please select both county and sub-county."),
+                    ),
+                  );
+                }
+              },
+            ),
             SizedBox(height: 50),
           ],
         ),

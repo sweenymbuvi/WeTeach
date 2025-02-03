@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/signup_number.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
@@ -15,9 +17,12 @@ class CreateAccountScreen extends StatefulWidget {
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool isAgreed = false;
+  final TextEditingController emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -70,17 +75,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                   SizedBox(height: screenWidth * 0.02),
                   TextField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       hintText: "Enter email",
-                      hintStyle: TextStyle(
-                          color: Color(0xFF828282)), // Hint text color
+                      hintStyle: TextStyle(color: Color(0xFF828282)),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SvgPicture.asset('assets/svg/email.svg',
                             height: 5, width: 5, fit: BoxFit.scaleDown),
                       ),
-                      fillColor: Color(0xFFFDFDFF), // Updated color
-                      filled: true, // Ensures the fill color is applied
+                      fillColor: Color(0xFFFDFDFF),
+                      filled: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
@@ -90,15 +95,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: Color(0x00476be8)
-                              .withOpacity(0.11), // Consistent color
+                          color: Color(0x00476be8).withOpacity(0.11),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: Color(0x00476be8)
-                              .withOpacity(0.11), // Same as normal border
+                          color: Color(0x00476be8).withOpacity(0.11),
                         ),
                       ),
                     ),
@@ -108,8 +111,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     children: [
                       Checkbox(
                         value: isAgreed,
-                        activeColor:
-                            Color(0xFF000EF8), // Checkbox color explicitly set
+                        activeColor: Color(0xFF000EF8),
                         onChanged: (value) {
                           setState(() {
                             isAgreed = value!;
@@ -153,21 +155,36 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     ],
                   ),
                   SizedBox(height: screenWidth * 0.1),
+                  if (authProvider.errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        authProvider.errorMessage!,
+                        style: TextStyle(color: Colors.red, fontSize: 14),
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: CustomButton(
-                      text: 'Sign Up',
-                      onPressed: isAgreed
-                          ? () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const OtpVerificationScreen(
-                                          isFromSignIn: false,
-                                          isFromSignupWithEmail: true),
-                                ),
+                      text:
+                          authProvider.isLoading ? 'Signing Up...' : 'Sign Up',
+                      onPressed: isAgreed && !authProvider.isLoading
+                          ? () async {
+                              final success = await authProvider.registerUser(
+                                email: emailController.text.trim(),
                               );
+                              if (success) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OtpVerificationScreen(
+                                      isFromSignIn: false,
+                                      isFromSignupWithEmail: true,
+                                      email: emailController.text,
+                                    ),
+                                  ),
+                                );
+                              }
                             }
                           : null,
                     ),
@@ -204,7 +221,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: screenWidth * 0.1),
+                  SizedBox(
+                      height: screenWidth * 0.1), // Add space before buttons
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Column(

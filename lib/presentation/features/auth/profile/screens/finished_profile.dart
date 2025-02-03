@@ -3,12 +3,47 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/profile_popup.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 
-class ProfileCompleteScreen extends StatelessWidget {
+class ProfileCompleteScreen extends StatefulWidget {
   const ProfileCompleteScreen({super.key});
 
   @override
+  _ProfileCompleteScreenState createState() => _ProfileCompleteScreenState();
+}
+
+class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
+  Map<String, dynamic>? userProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile(); // Fetch user profile data
+  }
+
+  Future<void> _fetchUserProfile() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      final userData = await authProvider.fetchUserData(); // Fetch user data
+      setState(() {
+        userProfile = userData; // Store the fetched profile data
+      });
+    } catch (error) {
+      // Handle error (e.g., show a snackbar)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load profile: $error')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (userProfile == null) {
+      return Center(
+          child: CircularProgressIndicator()); // Show loading indicator
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -23,13 +58,18 @@ class ProfileCompleteScreen extends StatelessWidget {
                     // Profile Picture
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: AssetImage(
-                          'assets/images/man.png'), // Replace with actual image
+                      backgroundImage: userProfile!['image'] != null &&
+                              userProfile!['image'].isNotEmpty
+                          ? NetworkImage(
+                              userProfile!['image']) // Use full image URL
+                          : AssetImage('assets/images/man.png')
+                              as ImageProvider,
                     ),
+
                     SizedBox(height: 16),
                     // Name and Profile Status
                     Text(
-                      "Simon Ndung'u",
+                      userProfile!['full_name'] ?? "User  Name",
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -68,7 +108,7 @@ class ProfileCompleteScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              "Nairobi\nWestlands",
+                              "${userProfile!['county']}\n${userProfile!['sub_county']}",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 14,
@@ -102,7 +142,7 @@ class ProfileCompleteScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              "3 Years\nExperience",
+                              "${userProfile!['experience']} Years\nExperience",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 14,
@@ -136,7 +176,7 @@ class ProfileCompleteScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              "3 H.S.\nSubjects",
+                              "${userProfile!['qualifications']} H.S.\nSubjects",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 14,

@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_pic.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:provider/provider.dart'; // Add this import
 
 class AccountProfileScreen extends StatefulWidget {
   const AccountProfileScreen({super.key});
@@ -15,16 +18,23 @@ class AccountProfileScreen extends StatefulWidget {
 class _AccountProfileScreenState extends State<AccountProfileScreen> {
   String? selectedLevel;
   final List<String> institutionLevels = [
+    'ECDE',
     'Primary School',
-    'Secondary School',
-    'University',
+    'High School',
+    'Junior Secondary',
   ];
   final int _currentPage = 0;
   final Color borderColor = Color(0x00476be8).withOpacity(0.11);
 
+  // Controllers for text fields
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
+  final TextEditingController experienceController = TextEditingController();
+
   Widget buildSectionTitle(String title) {
     return Material(
-      color: const Color(0xFFFDFDFF), // Set background color to #FDFDFF
+      color: const Color(0xFFFDFDFF),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
         child: Row(
@@ -34,7 +44,7 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: Colors.black, // Changed to black
+                color: Colors.black,
               ),
             ),
             Text(
@@ -55,13 +65,15 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
     required String hintText,
     Widget? prefixIcon,
     int maxLines = 1,
+    required TextEditingController controller,
   }) {
     return TextField(
+      controller: controller,
       maxLines: maxLines,
       style: GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: Colors.black, // Change color to black when typing
+        color: Colors.black,
       ),
       decoration: InputDecoration(
         hintText: hintText,
@@ -99,6 +111,8 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final padding = EdgeInsets.symmetric(horizontal: screenWidth * 0.04);
+    final authProvider =
+        Provider.of<AuthProvider>(context); // Access the auth provider
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -108,6 +122,7 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             floating: true,
+            pinned: true,
             snap: true,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -165,19 +180,19 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                           height: screenWidth * 0.06,
                           width: screenWidth * 0.06,
                         ),
+                        controller: fullNameController,
                       ),
                       SizedBox(height: screenHeight * 0.02),
                       buildSectionTitle('Phone Number'),
                       SizedBox(height: screenHeight * 0.02),
                       IntlPhoneField(
+                        controller: phoneNumberController,
                         decoration: InputDecoration(
-                          hintText:
-                              '712345678', // Use hintText instead of labelText
+                          hintText: '712345678',
                           hintStyle: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
-                            color: const Color(
-                                0xFF333333), // Set hint text color to #333333
+                            color: const Color(0xFF333333),
                           ),
                           filled: true,
                           fillColor: const Color(0xFFFDFDFF),
@@ -206,11 +221,15 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                       buildTextField(
                         hintText: 'Tell others about yourself',
                         maxLines: 5,
+                        controller: bioController,
                       ),
                       SizedBox(height: screenHeight * 0.02),
                       buildSectionTitle('Teaching Experience'),
                       SizedBox(height: screenHeight * 0.02),
-                      buildTextField(hintText: 'Enter number of years'),
+                      buildTextField(
+                        hintText: 'Enter number of years',
+                        controller: experienceController,
+                      ),
                       SizedBox(height: screenHeight * 0.02),
                       buildSectionTitle('Institution Level'),
                       SizedBox(height: screenHeight * 0.02),
@@ -267,17 +286,41 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                           children: [
                             CustomButton(
                               text: "Continue",
-                              onPressed: () {
-                                Navigator.push(
+                              onPressed: () async {
+                                final success =
+                                    await authProvider.createTeacherProfile(
+                                  userId: authProvider
+                                      .userId!, // User ID from "Set Password"
+                                  fullName: fullNameController.text,
+                                  phoneNumber: phoneNumberController.text,
+                                  bio: bioController.text,
+                                  institutionLevel: institutionLevels
+                                          .indexOf(selectedLevel!) +
+                                      1,
+                                  experience:
+                                      int.tryParse(experienceController.text) ??
+                                          0,
+                                );
+
+                                if (success) {
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            AddProfilePhotoScreen()));
+                                      builder: (context) =>
+                                          const AddProfilePhotoScreen(),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          "Failed to create teacher profile."),
+                                    ),
+                                  );
+                                }
                               },
                             ),
-                            SizedBox(
-                                height:
-                                    screenHeight * 0.02), // Added white space
+                            SizedBox(height: screenHeight * 0.02),
                           ],
                         ),
                       ),
