@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -26,8 +26,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
 
     // Call the sendOtpForPasswordReset method
-    final success = await Provider.of<AuthProvider>(context, listen: false)
-        .sendOtpForPasswordReset(email: email);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.sendOtpForPasswordReset(email: email);
 
     if (success) {
       // Show success message
@@ -49,14 +49,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                "Failed to send OTP: ${Provider.of<AuthProvider>(context, listen: false).errorMessage}")),
+            content: Text("Failed to send OTP: ${authProvider.errorMessage}")),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -160,8 +161,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       padding: const EdgeInsets.only(
                           bottom: 0.0), // Removed bottom padding
                       child: CustomButton(
-                        text: 'Request Code',
-                        onPressed: onRequestCodeClick,
+                        text: authProvider.isLoading
+                            ? 'Processing...'
+                            : 'Request Code',
+                        onPressed:
+                            !authProvider.isLoading ? onRequestCodeClick : null,
                       ),
                     ),
                   ),

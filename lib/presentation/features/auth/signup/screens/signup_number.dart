@@ -4,10 +4,10 @@ import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class SignupNumberScreen extends StatefulWidget {
   const SignupNumberScreen({super.key});

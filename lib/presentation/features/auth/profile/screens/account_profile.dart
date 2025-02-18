@@ -1,12 +1,13 @@
 import 'dart:convert';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:provider/provider.dart'; // Add this import
+import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart'; // Add this import
 
 class AccountProfileScreen extends StatefulWidget {
   const AccountProfileScreen({super.key});
@@ -31,6 +32,7 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
+  String _completePhoneNumber = '';
 
   Widget buildSectionTitle(String title) {
     return Material(
@@ -188,30 +190,38 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                       IntlPhoneField(
                         controller: phoneNumberController,
                         decoration: InputDecoration(
-                          hintText: '712345678',
+                          hintText: "712345678",
                           hintStyle: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                             color: const Color(0xFF333333),
                           ),
-                          filled: true,
                           fillColor: const Color(0xFFFDFDFF),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: borderColor),
+                            borderSide: BorderSide(
+                              color: const Color(0x00476be8).withOpacity(0.11),
+                            ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: borderColor),
+                            borderSide: BorderSide(
+                              color: const Color(0x00476be8).withOpacity(0.11),
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: borderColor),
+                            borderSide: BorderSide(
+                              color: const Color(0x00476be8).withOpacity(0.11),
+                            ),
                           ),
                         ),
-                        initialCountryCode: 'KE',
-                        onChanged: (phone) {
-                          print(phone.completeNumber);
+                        initialCountryCode:
+                            'KE', // Default country code set to Kenya
+                        onChanged: (PhoneNumber phone) {
+                          // Store the complete phone number
+                          _completePhoneNumber = phone.completeNumber;
                         },
                         disableLengthCheck: true,
                       ),
@@ -287,12 +297,25 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                             CustomButton(
                               text: "Continue",
                               onPressed: () async {
+                                // Validate that the phone number is not empty
+                                if (_completePhoneNumber.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          "Please enter a valid phone number."),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                // Call the createTeacherProfile method
                                 final success =
                                     await authProvider.createTeacherProfile(
                                   userId: authProvider
                                       .userId!, // User ID from "Set Password"
                                   fullName: fullNameController.text,
-                                  phoneNumber: phoneNumberController.text,
+                                  phoneNumber:
+                                      _completePhoneNumber, // Use the complete phone number
                                   bio: bioController.text,
                                   institutionLevel: institutionLevels
                                           .indexOf(selectedLevel!) +

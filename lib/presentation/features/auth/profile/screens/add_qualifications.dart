@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:we_teach/presentation/features/auth/profile/screens/add_location.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class QualificationsScreen extends StatefulWidget {
   const QualificationsScreen({super.key});
@@ -83,6 +83,9 @@ class _QualificationsScreenState extends State<QualificationsScreen> {
         sortedCategories.add(category);
       }
     }
+
+    final authProvider =
+        Provider.of<AuthProvider>(context); // Access the auth provider
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -182,7 +185,10 @@ class _QualificationsScreenState extends State<QualificationsScreen> {
                         ),
                       const SizedBox(height: 24),
                       CustomButton(
-                        onPressed: selectedSubjects.isNotEmpty
+                        text:
+                            authProvider.isLoading ? 'Processing...' : "Finish",
+                        onPressed: !authProvider.isLoading &&
+                                selectedSubjects.isNotEmpty
                             ? () async {
                                 final authProvider = Provider.of<AuthProvider>(
                                     context,
@@ -221,8 +227,7 @@ class _QualificationsScreenState extends State<QualificationsScreen> {
                                   );
                                 }
                               }
-                            : null, // Disables button if no subjects are selected
-                        text: "Finish",
+                            : null, // Disables button if no subjects are selected or if loading
                       ),
                     ],
                   ),

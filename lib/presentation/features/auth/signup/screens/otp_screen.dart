@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_password_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final bool isFromSignIn;
@@ -164,6 +164,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     final String title = widget.isFromRecoverPassword
         ? "Recover Password"
         : widget.isFromSignIn
@@ -320,8 +321,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 70.0),
               child: CustomButton(
-                text: "Complete Verification",
-                onPressed: () => _submitOtp(context),
+                text: authProvider.isLoading
+                    ? 'Processing...'
+                    : (widget.isFromSignupWithEmail
+                        ? "Create Account"
+                        : "Complete Verification"),
+                onPressed: !authProvider.isLoading
+                    ? () async {
+                        await _submitOtp(context);
+                      }
+                    : null,
               ),
             ),
           ),

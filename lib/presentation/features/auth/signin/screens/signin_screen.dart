@@ -6,7 +6,8 @@ import 'package:we_teach/presentation/features/auth/forgot_password/screens/forg
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_number.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -251,8 +252,18 @@ class _SignInScreenState extends State<SignInScreen> {
                                         content: Text("Sign In successful!"),
                                       ),
                                     );
+
+                                    // Clear the text fields
                                     _emailController.clear();
                                     _passwordController.clear();
+
+                                    // Navigate to the Manage Profile screen
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ManageProfileScreen()),
+                                    );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(

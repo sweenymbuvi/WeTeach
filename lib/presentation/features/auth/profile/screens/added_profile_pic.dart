@@ -4,10 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_qualifications.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
-import 'dart:io'; // Import for File
+import 'dart:io';
+
+import 'package:we_teach/presentation/shared/widgets/my_button.dart'; // Import for File
 
 class ProfilePhotoAddedScreen extends StatelessWidget {
   final String imagePath; // Add a field to hold the image path

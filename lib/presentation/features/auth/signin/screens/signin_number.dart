@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/forgot_password/screens/forgot_password_screen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class SignInNumberScreen extends StatefulWidget {
   const SignInNumberScreen({super.key});

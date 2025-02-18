@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/stat_widget.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/presentation/shared/widgets/stat_widget.dart';
 import 'package:we_teach/presentation/theme/theme.dart';
 
 class WelcomeScreen extends StatelessWidget {

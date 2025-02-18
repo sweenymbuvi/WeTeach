@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/role_card_widget.dart';
+import 'package:we_teach/presentation/shared/widgets/role_card_widget.dart';
 
 class RoleScreen extends StatefulWidget {
   const RoleScreen({super.key});

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart'; //flutter secure storage
+import 'package:dio/dio.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
@@ -11,6 +13,7 @@ class AuthProvider with ChangeNotifier {
   String? _refreshToken;
   int? _userId; // Variable to store the user ID
   int? _teacherId;
+  String? _userEmail;
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -19,22 +22,29 @@ class AuthProvider with ChangeNotifier {
   String? get refreshToken => _refreshToken;
   int? get userId => _userId; // Getter for user ID
   int? get teacherId => _teacherId;
+  String? get userEmail => _userEmail;
 
   // Method to store tokens securely
+  final _secureStorage = SecureStorageService();
+
   Future<void> storeTokens(
-      String accessToken, String refreshToken, int userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access', accessToken); // Store as 'access'
-    await prefs.setString('refresh', refreshToken); // Store as 'refresh'
-    await prefs.setInt('userId', userId); // Store user ID
+    String accessToken,
+    String refreshToken,
+    int? userId, // Make userId nullable
+  ) async {
+    await _secureStorage.storeAllCredentials(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      userId: userId, // Pass userId (can be null)
+    );
   }
 
   Future<void> loadTokens() async {
-    final prefs = await SharedPreferences.getInstance();
-    _accessToken = prefs.getString('access');
-    _refreshToken = prefs.getString('refresh');
-    _userId = prefs.getInt('userId'); // Load user ID
-    _isAuthenticated = _accessToken != null && _userId != null; // Check both
+    final credentials = await _secureStorage.getAllCredentials();
+    _accessToken = credentials['accessToken'];
+    _refreshToken = credentials['refreshToken'];
+    _userId = credentials['userId'];
+    _isAuthenticated = await _secureStorage.isAuthenticated();
     notifyListeners();
   }
 
@@ -54,15 +64,24 @@ class AuthProvider with ChangeNotifier {
           "is_teacher": true,
         }),
       );
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         _isAuthenticated = true;
+        _userEmail = email; // Store the email when registration is successful
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
         final responseData = jsonDecode(response.body);
-        _errorMessage = responseData['message'] ?? "An error occurred";
+
+        if (responseData['email'] != null &&
+            responseData['email'][0] == "This field must be unique.") {
+          _errorMessage =
+              "This email is already registered. Please use a different one.";
+        } else {
+          _errorMessage = responseData['message'] ?? "An error occurred";
+        }
       }
     } catch (error) {
       _errorMessage = "An error occurred: $error";
@@ -363,8 +382,18 @@ class AuthProvider with ChangeNotifier {
         final responseData = jsonDecode(response.body);
         _accessToken = responseData['access'];
         _refreshToken = responseData['refresh'];
+        int? userId = responseData[
+            'user_id']; // Assuming the user ID is returned in the response
         _isAuthenticated = true;
         _isLoading = false;
+
+        // Store tokens in secure storage (with userId)
+        await storeTokens(
+          _accessToken!,
+          _refreshToken!,
+          userId, // Pass userId (can be null)
+        );
+
         notifyListeners();
         return true;
       } else {
@@ -555,25 +584,29 @@ class AuthProvider with ChangeNotifier {
     required String bio,
     required int institutionLevel,
     required int experience,
-    required int userId, // Added userId as a parameter
+    required int userId,
   }) async {
     if (_accessToken == null) {
       print("Access token not found. Please sign in again.");
       return false;
     }
 
-    // Prepare the teacher data
+    if (_userEmail == null) {
+      print("User email not found. Please register first.");
+      return false;
+    }
+
     final teacherData = {
       "full_name": fullName,
       "phone_number": phoneNumber,
       "bio": bio,
       "institution_level": institutionLevel,
       "experience": experience,
-      "user": userId, // Use the userId parameter
+      "user": userId,
       "is_active": true,
+      "primary_email": _userEmail, // Use the stored email here
     };
 
-    // Prepare the API request
     final url =
         Uri.parse('https://api.mwalimufinder.com/api/v1/users/teacher/');
     try {
@@ -585,25 +618,21 @@ class AuthProvider with ChangeNotifier {
         },
         body: jsonEncode(teacherData),
       );
-
       print("Status Code: ${response.statusCode}");
       print("Response Body: ${response.body}");
 
-      // Check for success response
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData is Map<String, dynamic> &&
             responseData.containsKey('id')) {
           print("Teacher profile created successfully: $responseData");
-          // Save the teacher ID for future updates
           _teacherId = responseData['id'];
-          return true; // Indicate success
+          return true;
         } else {
           print(
               "Response does not contain expected profile data: $responseData");
         }
       } else {
-        // Handle error
         print(
             "Failed to create teacher profile. Status Code: ${response.statusCode}");
         print("Response Body: ${response.body}");
@@ -611,8 +640,7 @@ class AuthProvider with ChangeNotifier {
     } catch (error) {
       print("An error occurred: $error");
     }
-
-    return false; // Return false if the operation was not successful
+    return false;
   }
 
   Future<bool> updateTeacherProfile({
@@ -639,44 +667,40 @@ class AuthProvider with ChangeNotifier {
     }
 
     // Prepare the API request
-    final url = Uri.parse(
-        'https://api.mwalimufinder.com/api/v1/users/teacher/modify/$_teacherId/');
+    final url =
+        'https://api.mwalimufinder.com/api/v1/users/teacher/modify/$_teacherId/';
     try {
-      var request = http.MultipartRequest('PATCH', url)
-        ..headers['Authorization'] = 'Bearer $_accessToken';
+      var dio = Dio();
+      dio.options.headers['Authorization'] = 'Bearer $_accessToken';
 
-      // Add fields to the request
-      request.fields['user'] = userId.toString();
-      if (fullName != null) request.fields['full_name'] = fullName;
-      if (experience != null)
-        request.fields['experience'] = experience.toString();
-      if (phoneNumber != null) request.fields['phone_number'] = phoneNumber;
-      if (primaryEmail != null) request.fields['primary_email'] = primaryEmail;
-      if (bio != null) request.fields['bio'] = bio;
-      if (latitude != null) request.fields['latitude'] = latitude.toString();
-      if (longitude != null) request.fields['longitude'] = longitude.toString();
-      if (formattedAddress != null)
-        request.fields['formated_address'] = formattedAddress;
-      if (isActive != null) request.fields['is_active'] = isActive.toString();
-      if (institutionLevel != null)
-        request.fields['institution_level'] = institutionLevel.toString();
-      if (county != null) request.fields['county'] = county.toString();
-      if (subCounty != null)
-        request.fields['sub_county'] = subCounty.toString();
-
-      // Add qualifications as separate fields
-      if (qualifications != null) {
-        for (int qualification in qualifications) {
-          request.fields['qualifications'] = qualification.toString();
-        }
-      }
+      var formData = FormData.fromMap({
+        'user': userId.toString(),
+        if (fullName != null) 'full_name': fullName,
+        if (experience != null) 'experience': experience.toString(),
+        if (phoneNumber != null) 'phone_number': phoneNumber,
+        if (primaryEmail != null) 'primary_email': primaryEmail,
+        if (bio != null) 'bio': bio,
+        if (latitude != null) 'latitude': latitude.toString(),
+        if (longitude != null) 'longitude': longitude.toString(),
+        if (formattedAddress != null) 'formated_address': formattedAddress,
+        if (isActive != null) 'is_active': isActive.toString(),
+        if (institutionLevel != null)
+          'institution_level': institutionLevel.toString(),
+        if (county != null) 'county': county.toString(),
+        if (subCounty != null) 'sub_county': subCounty.toString(),
+        if (qualifications != null)
+          'qualifications': qualifications.map((q) => q.toString()).toList(),
+      });
 
       // Add image file to the request
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image));
+        formData.files.add(MapEntry(
+          'image',
+          await MultipartFile.fromFile(image),
+        ));
       }
 
-      final response = await request.send();
+      final response = await dio.patch(url, data: formData);
 
       print("Status Code: ${response.statusCode}");
 
@@ -687,8 +711,7 @@ class AuthProvider with ChangeNotifier {
       } else {
         print(
             "Failed to update teacher profile. Status Code: ${response.statusCode}");
-        final responseData = await response.stream.bytesToString();
-        print("Response Body: $responseData");
+        print("Response Body: ${response.data}");
       }
     } catch (error) {
       print("An error occurred: $error");

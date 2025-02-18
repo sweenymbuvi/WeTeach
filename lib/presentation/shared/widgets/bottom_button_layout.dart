@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class BottomButtonLayout extends StatelessWidget {
   final Widget content;

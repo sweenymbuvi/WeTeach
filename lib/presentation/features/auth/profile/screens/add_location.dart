@@ -6,7 +6,7 @@ import 'package:provider/provider.dart'; // Import this for Provider
 import 'package:we_teach/data/repositories/auth/auth_repo.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/finished_profile.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class AddLocationScreen extends StatefulWidget {
   const AddLocationScreen({super.key});

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Add this package to your pubspec.yaml
 import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
+import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class ProfilePopup extends StatefulWidget {
   const ProfilePopup({super.key});
@@ -124,7 +125,11 @@ class _ProfilePopupState extends State<ProfilePopup> {
                     text: 'Preview your Profile',
                     onPressed: () {
                       // Add your action here
-                      Navigator.pop(context); // Close the bottom sheet
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ManageProfileScreen())); // Close the bottom sheet
                     },
                     isOutlined: false,
                   ),
@@ -140,16 +145,6 @@ class _ProfilePopupState extends State<ProfilePopup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
       body: Container(color: Colors.white), // Blank page background
     );
   }

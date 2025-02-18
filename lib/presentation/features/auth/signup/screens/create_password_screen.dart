@@ -4,8 +4,8 @@ import 'package:we_teach/presentation/features/auth/profile/screens/account_prof
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/widgets/password_field_widget.dart';
-import 'package:we_teach/presentation/features/auth/welcome/widgets/my_button.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 
 class CreatePasswordScreen extends StatefulWidget {
   final bool isFromSignup;
@@ -141,55 +141,59 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
               Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
                   return CustomButton(
-                    text: widget.isFromSignup ? "Create Account" : "Complete",
-                    onPressed: () async {
-                      if (passwordController.text.length < 8) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  "Password must be at least 8 characters long")),
-                        );
-                        return;
-                      }
-                      if (passwordController.text !=
-                          confirmPasswordController.text) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Passwords do not match")),
-                        );
-                        return;
-                      }
+                    text: authProvider.isLoading
+                        ? 'Processing...'
+                        : (widget.isFromSignup ? "Create Account" : "Complete"),
+                    onPressed: !authProvider.isLoading
+                        ? () async {
+                            if (passwordController.text.length < 8) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Password must be at least 8 characters long")),
+                              );
+                              return;
+                            }
+                            if (passwordController.text !=
+                                confirmPasswordController.text) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Passwords do not match")),
+                              );
+                              return;
+                            }
 
-                      bool result = await authProvider.setPassword(
-                        otpCode: widget.otp,
-                        password: passwordController.text.trim(),
-                        password2: confirmPasswordController.text.trim(),
-                      );
+                            bool result = await authProvider.setPassword(
+                              otpCode: widget.otp,
+                              password: passwordController.text.trim(),
+                              password2: confirmPasswordController.text.trim(),
+                            );
 
-                      if (result) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Password set successfully!'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        await Future.delayed(Duration(seconds: 2));
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => widget.isFromSignup
-                                ? AccountProfileScreen()
-                                : SignInScreen(),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text(authProvider.errorMessage ?? "Error")),
-                        );
-                      }
-                    },
+                            if (result) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Password set successfully!'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                              await Future.delayed(Duration(seconds: 2));
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => widget.isFromSignup
+                                      ? AccountProfileScreen()
+                                      : SignInScreen(),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        authProvider.errorMessage ?? "Error")),
+                              );
+                            }
+                          }
+                        : null,
                   );
                 },
               ),
