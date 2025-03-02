@@ -88,6 +88,52 @@ class ProfileRepository {
     }
   }
 
+  Future<bool> updateUserData({
+    required String accessToken,
+    required int userId,
+    required String newEmail,
+  }) async {
+    final url = Uri.parse('https://api.mwalimufinder.com/api/v1/users/user/');
+
+    try {
+      // Print request details
+      print("Sending API Request to: $url");
+      print("Request Headers: {");
+      print("Content-Type: application/json");
+      print("Authorization: Bearer $accessToken");
+      print("Request Body: {\"id\":$userId, \"email\":\"$newEmail\"}");
+
+      final response = await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "id": userId,
+          "email": newEmail,
+        }),
+      );
+
+      // Print response details
+      print("Status Code: \${response.statusCode}");
+      print("Response Headers: \${response.headers}");
+      print("Response Body: \${response.body}");
+
+      if (response.statusCode == 200) {
+        print("User email updated successfully!");
+        return true;
+      } else {
+        final responseData = jsonDecode(response.body);
+        throw Exception(
+            responseData['message'] ?? "Failed to update user data.");
+      }
+    } catch (error) {
+      print("Error updating user data: $error");
+      return false;
+    }
+  }
+
   // Fetch counties
   Future<Map<String, String>> fetchCounties(String accessToken) async {
     final url = Uri.parse('$baseUrl/counties/');

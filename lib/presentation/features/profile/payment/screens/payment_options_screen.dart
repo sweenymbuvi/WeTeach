@@ -20,23 +20,56 @@ class PaymentOptionsScreen extends StatefulWidget {
 
 class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
   String? _cardNumber;
+  bool _isFirstLoad = true;
+  bool _hasError = false;
+  String _errorMessage = "";
+  bool _isInitializing = true; // Flag to track initialization state
 
   @override
   void initState() {
     super.initState();
     _cardNumber = widget.cardNumber; // Initialize with passed value
-    _fetchPaymentMethods();
+    // Don't call _fetchPaymentMethods here to avoid duplicate calls
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchPaymentMethods(); // Ensures the latest data when navigating back
+    // Only fetch on the first load or when returning to this screen
+    if (_isFirstLoad) {
+      _isFirstLoad = false;
+      // Use Future.microtask to avoid calling setState during build
+      Future.microtask(() => _fetchPaymentMethods());
+    }
   }
 
-  void _fetchPaymentMethods() {
-    final provider = Provider.of<PaymentProvider>(context, listen: false);
-    provider.fetchPaymentMethods();
+  Future<void> _fetchPaymentMethods() async {
+    if (!mounted) return; // Safety check to prevent setState after disposal
+
+    setState(() {
+      _hasError = false;
+      _errorMessage = "";
+      _isInitializing = true; // Set loading state
+    });
+
+    try {
+      final provider = Provider.of<PaymentProvider>(context, listen: false);
+      await provider.fetchPaymentMethods();
+
+      if (!mounted) return; // Check again after async operation
+
+      setState(() {
+        _isInitializing = false; // Update state after fetch completes
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _hasError = true;
+        _errorMessage = "Failed to load payment methods. ${e.toString()}";
+        _isInitializing = false;
+      });
+    }
   }
 
   @override
@@ -72,10 +105,16 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0, top: 10),
-            child: SvgPicture.asset(
-              'assets/svg/add.svg',
-              height: 40,
-              width: 40,
+            child: IconButton(
+              icon: SvgPicture.asset(
+                'assets/svg/add.svg',
+                height: 40,
+                width: 40,
+              ),
+              onPressed: () async {
+                // Add payment method action
+                // You might want to navigate to an add payment page
+              },
             ),
           ),
         ],
@@ -84,92 +123,156 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Consumer<PaymentProvider>(
           builder: (context, paymentProvider, child) {
-            if (paymentProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+            if (_isInitializing || paymentProvider.isLoading) {
+              return const Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    "Loading payment methods...",
+                    style: TextStyle(color: Color(0xFF5C5C5C)),
+                  )
+                ],
+              ));
             }
 
-            if (paymentProvider.paymentMethods.isEmpty) {
-              return const Center(
-                child: Text("No payment methods available."),
+            if (_hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _fetchPaymentMethods,
+                      child: const Text("Retry"),
+                    )
+                  ],
+                ),
               );
             }
 
+            // Safety check for empty payment methods
+            final paymentMethods = paymentProvider.paymentMethods;
+            if (paymentMethods.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "No payment methods available.",
+                      style: TextStyle(fontSize: 16, color: Color(0xFF5C5C5C)),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MpesaPaymentScreen(),
+                          ),
+                        );
+                        _fetchPaymentMethods();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF000EF8),
+                      ),
+                      child: const Text("Add M-Pesa"),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Get latest payment method safely
             final latestPaymentMethod =
-                paymentProvider.paymentMethods.isNotEmpty
-                    ? paymentProvider.paymentMethods.last
-                    : null;
+                paymentMethods.isNotEmpty ? paymentMethods.last : null;
 
-            String maskedPhoneNumber = latestPaymentMethod != null
-                ? maskPhoneNumber(latestPaymentMethod['phone_number'])
-                : "No payment method added";
+            // Safely get masked phone number
+            String maskedPhoneNumber = "No payment method added";
+            if (latestPaymentMethod != null &&
+                latestPaymentMethod.containsKey('phone_number') &&
+                latestPaymentMethod['phone_number'] != null) {
+              maskedPhoneNumber =
+                  maskPhoneNumber(latestPaymentMethod['phone_number']);
+            }
 
-            return Column(
-              children: [
-                PaymentOptionCard(
-                  logo: 'assets/images/mpesa.png',
-                  title: 'Mpesa',
-                  subtitle: maskedPhoneNumber,
-                  paymentMethodId: widget.paymentMethodId,
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MpesaPaymentScreen(),
-                      ),
-                    );
-                    _fetchPaymentMethods(); // Refresh after returning
-                  },
-                  onMoreOptions: () {},
-                  onEditPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MpesaPaymentScreen(),
-                      ),
-                    );
-                    _fetchPaymentMethods();
-                  },
-                  showThreeDots: true,
-                ),
-                const SizedBox(height: 16),
-                PaymentOptionCard(
-                  logo: 'assets/images/visa.png',
-                  title: 'Bank Card',
-                  subtitle: _cardNumber != null
-                      ? maskCardNumber(_cardNumber!)
-                      : 'VISA **** 8888',
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CardPaymentScreen(),
-                      ),
-                    );
-                    if (result is String) {
-                      setState(() {
-                        _cardNumber = result; // Update card number
-                      });
-                    }
-                    _fetchPaymentMethods();
-                  },
-                  onMoreOptions: () {},
-                  onEditPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CardPaymentScreen(),
-                      ),
-                    );
-                    if (result is String) {
-                      setState(() {
-                        _cardNumber = result; // Update card number
-                      });
-                    }
-                    _fetchPaymentMethods();
-                  },
-                  showThreeDots: true,
-                ),
-              ],
+            return RefreshIndicator(
+              onRefresh: _fetchPaymentMethods,
+              child: ListView(
+                children: [
+                  PaymentOptionCard(
+                    logo: 'assets/images/mpesa.png',
+                    title: 'Mpesa',
+                    subtitle: maskedPhoneNumber,
+                    paymentMethodId: latestPaymentMethod?['id']?.toString(),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MpesaPaymentScreen(),
+                        ),
+                      );
+                      _fetchPaymentMethods(); // Refresh after returning
+                    },
+                    onMoreOptions: () {},
+                    onEditPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MpesaPaymentScreen(),
+                        ),
+                      );
+                      _fetchPaymentMethods();
+                    },
+                    showThreeDots: true,
+                  ),
+                  const SizedBox(height: 16),
+                  PaymentOptionCard(
+                    logo: 'assets/images/visa.png',
+                    title: 'Bank Card',
+                    subtitle: _cardNumber != null
+                        ? maskCardNumber(_cardNumber!)
+                        : 'VISA **** 8888',
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CardPaymentScreen(),
+                        ),
+                      );
+                      if (result is String) {
+                        setState(() {
+                          _cardNumber = result; // Update card number
+                        });
+                      }
+                      _fetchPaymentMethods();
+                    },
+                    onMoreOptions: () {},
+                    onEditPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CardPaymentScreen(),
+                        ),
+                      );
+                      if (result is String) {
+                        setState(() {
+                          _cardNumber = result; // Update card number
+                        });
+                      }
+                      _fetchPaymentMethods();
+                    },
+                    showThreeDots: true,
+                  ),
+                ],
+              ),
             );
           },
         ),
@@ -178,6 +281,7 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
   }
 
   String maskPhoneNumber(String phoneNumber) {
+    if (phoneNumber == null || phoneNumber.isEmpty) return "Not provided";
     if (phoneNumber.length < 8) return phoneNumber;
     return phoneNumber.substring(0, 4) +
         '****' +
@@ -185,6 +289,7 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
   }
 
   String maskCardNumber(String cardNumber) {
+    if (cardNumber == null || cardNumber.isEmpty) return "Not provided";
     if (cardNumber.length < 4) return cardNumber;
     return '**** **** **** ' + cardNumber.substring(cardNumber.length - 4);
   }

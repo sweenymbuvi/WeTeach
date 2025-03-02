@@ -134,15 +134,35 @@ class PersonalInfoProvider with ChangeNotifier {
       if (_userData == null ||
           !_userData!.containsKey('user_id') ||
           !_userData!.containsKey('teacher_id')) {
-        _errorMessage = "User  data not loaded. Please refresh and try again.";
+        _errorMessage = "User data not loaded. Please refresh and try again.";
         print("Error: $_errorMessage");
         return false;
       }
 
+      final int userId = _userData!['user_id'];
+      final int teacherId = _userData!['teacher_id'];
+
+      // Update user email if provided
+      if (primaryEmail != null && primaryEmail.isNotEmpty) {
+        print("Updating user email to: $primaryEmail");
+        final emailUpdated = await _profileRepository.updateUserData(
+          accessToken: accessToken,
+          userId: userId,
+          newEmail: primaryEmail,
+        );
+
+        if (!emailUpdated) {
+          _errorMessage = "Failed to update email.";
+          print("Update Email Error: $_errorMessage");
+          return false;
+        }
+      }
+
+      // Update teacher profile
       final success = await _profileRepository.updateTeacherProfile(
         accessToken: accessToken,
-        userId: _userData!['user_id'],
-        teacherId: _userData!['teacher_id'],
+        userId: userId,
+        teacherId: teacherId,
         fullName: fullName,
         experience: experience,
         phoneNumber: phoneNumber,

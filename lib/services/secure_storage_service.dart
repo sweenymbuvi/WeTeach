@@ -8,6 +8,8 @@ class SecureStorageService {
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'user_id';
   static const String _teacherIdKey = 'teacher_id';
+  static const String _emailKey = 'user_email';
+  static const String _otpKey = 'otp_code';
 
   // Store access token
   Future<void> storeAccessToken(String token) async {
@@ -35,12 +37,14 @@ class SecureStorageService {
     required String refreshToken,
     int? userId,
     int? teacherId,
+    String? userEmail, // Add userEmail parameter
   }) async {
     await Future.wait([
       storeAccessToken(accessToken),
       storeRefreshToken(refreshToken),
       if (userId != null) storeUserId(userId),
       if (teacherId != null) storeTeacherId(teacherId),
+      if (userEmail != null) storeEmail(userEmail), // Store userEmail
     ]);
   }
 
@@ -72,13 +76,20 @@ class SecureStorageService {
     final refreshToken = await getRefreshToken();
     final userId = await getUserId();
     final teacherId = await getTeacherId();
+    final userEmail = await getEmail(); // Retrieve userEmail
 
     return {
       'accessToken': accessToken,
       'refreshToken': refreshToken,
       'userId': userId,
       'teacherId': teacherId,
+      'userEmail': userEmail, // Include userEmail in the returned map
     };
+  }
+
+  // Load tokens and return them
+  Future<Map<String, dynamic>> loadTokens() async {
+    return await getAllCredentials();
   }
 
   // Delete all stored credentials
@@ -96,5 +107,41 @@ class SecureStorageService {
     final accessToken = await getAccessToken();
     final userId = await getUserId();
     return accessToken != null && userId != null;
+  }
+
+  // Store last visited screen
+  Future<void> storeLastVisitedScreen(String screenName) async {
+    await _storage.write(key: 'last_visited_screen', value: screenName);
+  }
+
+// Get last visited screen
+  Future<String?> getLastVisitedScreen() async {
+    return await _storage.read(key: 'last_visited_screen');
+  }
+
+  // Add this method to your SecureStorageService class
+  // Store email and last visited screen
+  Future<void> storeEmail(String email) async {
+    await _storage.write(key: _emailKey, value: email);
+    await storeLastVisitedScreen(
+        'OtpVerificationScreen'); // Ensure screen is saved
+  }
+
+// Add a method to retrieve the email if needed
+  Future<String?> getEmail() async {
+    return await _storage.read(key: _emailKey);
+  }
+
+  Future<void> storeOtpCode(int otp) async {
+    await _storage.write(key: _otpKey, value: otp.toString());
+  }
+
+  Future<int?> getOtpCode() async {
+    final value = await _storage.read(key: _otpKey);
+    return value != null ? int.parse(value) : null;
+  }
+
+  Future<void> deleteOtpCode() async {
+    await _storage.delete(key: _otpKey);
   }
 }
