@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
+import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -16,7 +18,33 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      onTap: onTap,
+      onTap: (index) {
+        // Handle navigation based on the tapped index
+        switch (index) {
+          case 0:
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+            break;
+          case 1:
+            // Navigate to My Jobs screen (implement this screen)
+            break;
+          case 2:
+            // Handle Apply icon tap (implement this action)
+            break;
+          case 3:
+            // Navigate to Notifications screen (implement this screen)
+            break;
+          case 4:
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ManageProfileScreen()),
+            );
+            break;
+        }
+        onTap(index); // Call the provided onTap function
+      },
       type: BottomNavigationBarType.fixed,
       backgroundColor: Colors.white,
       selectedItemColor: const Color(0xFF000EF8), // Highlight selected icon
