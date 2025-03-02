@@ -6,8 +6,9 @@ import 'package:we_teach/presentation/features/auth/forgot_password/screens/forg
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_number.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
-import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
+import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -20,6 +21,13 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final SecureStorageService _secureStorageService = SecureStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    _secureStorageService.storeLastVisitedScreen('SignInScreen');
+  }
 
   @override
   void dispose() {
@@ -40,7 +48,8 @@ class _SignInScreenState extends State<SignInScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CreateAccountScreen())),
         ),
       ),
       body: Column(
@@ -257,12 +266,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                     _emailController.clear();
                                     _passwordController.clear();
 
-                                    // Navigate to the Manage Profile screen
+                                    // Navigate to the Home screen
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              ManageProfileScreen()),
+                                              HomeScreen()), // Change to HomeScreen
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -15,6 +17,14 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   TextEditingController emailController = TextEditingController();
+  final SecureStorageService _secureStorageService = SecureStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Store the last visited screen
+    _secureStorageService.storeLastVisitedScreen('ForgotPasswordScreen');
+  }
 
   void onRequestCodeClick() async {
     final email = emailController.text.trim();
@@ -42,6 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           builder: (context) => OtpVerificationScreen(
             isFromSignIn: false,
             isFromRecoverPassword: true,
+            email: email,
           ),
         ),
       );
@@ -64,7 +75,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SignInScreen()));
           },
         ),
         elevation: 0,

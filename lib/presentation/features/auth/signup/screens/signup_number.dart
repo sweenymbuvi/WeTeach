@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
-import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -21,6 +22,14 @@ class _SignupNumberScreenState extends State<SignupNumberScreen> {
   final TextEditingController _phoneNumberController = TextEditingController();
   String _completePhoneNumber = '';
 
+  final SecureStorageService _secureStorageService = SecureStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    _secureStorageService.storeLastVisitedScreen('SignupNumberScreen');
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -31,7 +40,8 @@ class _SignupNumberScreenState extends State<SignupNumberScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CreateAccountScreen()));
           },
         ),
         elevation: 0,

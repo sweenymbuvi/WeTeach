@@ -5,6 +5,7 @@ import 'package:we_teach/presentation/features/auth/profile/screens/profile_popu
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart'; // Import SecureStorageService
 
 class ProfileCompleteScreen extends StatefulWidget {
   const ProfileCompleteScreen({super.key});
@@ -19,6 +20,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
   @override
   void initState() {
     super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('ProfileCompleteScreen');
     _fetchUserProfile(); // Fetch user profile data
   }
 

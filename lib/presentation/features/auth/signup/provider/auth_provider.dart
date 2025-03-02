@@ -31,11 +31,13 @@ class AuthProvider with ChangeNotifier {
     String accessToken,
     String refreshToken,
     int? userId, // Make userId nullable
+    String? userEmail, // Add userEmail parameter
   ) async {
     await _secureStorage.storeAllCredentials(
       accessToken: accessToken,
       refreshToken: refreshToken,
       userId: userId, // Pass userId (can be null)
+      userEmail: userEmail, // Pass userEmail
     );
   }
 
@@ -44,6 +46,8 @@ class AuthProvider with ChangeNotifier {
     _accessToken = credentials['accessToken'];
     _refreshToken = credentials['refreshToken'];
     _userId = credentials['userId'];
+    _userEmail = credentials['userEmail']; // Load userEmail
+    _teacherId = credentials['teacherId']; // Load teacherId
     _isAuthenticated = await _secureStorage.isAuthenticated();
     notifyListeners();
   }
@@ -69,6 +73,11 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         _isAuthenticated = true;
         _userEmail = email; // Store the email when registration is successful
+
+        // Store the email in secure storage
+        await _secureStorage
+            .storeEmail(_userEmail!); // Ensure userEmail is not null
+
         _isLoading = false;
         notifyListeners();
         return true;
@@ -326,7 +335,7 @@ class AuthProvider with ChangeNotifier {
         _userId = responseData['user']['id']; // Extract and store the user ID
 
         // Store tokens securely
-        await storeTokens(_accessToken!, _refreshToken!, _userId!);
+        await storeTokens(_accessToken!, _refreshToken!, _userId!, userEmail);
 
         _errorMessage = responseData['message'] ?? "Password set successfully";
         _isAuthenticated = true;
@@ -392,6 +401,7 @@ class AuthProvider with ChangeNotifier {
           _accessToken!,
           _refreshToken!,
           userId, // Pass userId (can be null)
+          userEmail,
         );
 
         notifyListeners();
@@ -586,13 +596,16 @@ class AuthProvider with ChangeNotifier {
     required int experience,
     required int userId,
   }) async {
+    await loadTokens(); // Load tokens to ensure they are available
+    _userEmail = await _secureStorage.getEmail(); // Retrieve the stored email
+
     if (_accessToken == null) {
       print("Access token not found. Please sign in again.");
       return false;
     }
 
     if (_userEmail == null) {
-      print("User email not found. Please register first.");
+      print("User  email not found. Please register first.");
       return false;
     }
 
@@ -627,6 +640,11 @@ class AuthProvider with ChangeNotifier {
             responseData.containsKey('id')) {
           print("Teacher profile created successfully: $responseData");
           _teacherId = responseData['id'];
+
+          // Store the teacher ID in secure storage
+          await _secureStorage
+              .storeTeacherId(_teacherId!); // Ensure teacherId is not null
+
           return true;
         } else {
           print(
@@ -660,9 +678,15 @@ class AuthProvider with ChangeNotifier {
     List<int>? qualifications,
     String? image, // Image path
   }) async {
-    // Ensure the teacher ID and access token are available
-    if (_teacherId == null || _accessToken == null) {
-      print("Teacher ID or access token not found. Please sign in again.");
+    // Load tokens and user ID from secure storage
+    final secureStorageService = SecureStorageService();
+    await loadTokens(); // Ensure tokens are loaded
+    final storedUserId = await secureStorageService.getUserId();
+
+    // Ensure the teacher ID, access token, and user ID are available
+    if (_teacherId == null || _accessToken == null || storedUserId == null) {
+      print(
+          "Teacher ID, access token, or user ID not found. Please sign in again.");
       return false;
     }
 
@@ -764,6 +788,9 @@ class AuthProvider with ChangeNotifier {
 
   // Method to fetch subject categories and their subjects
   Future<List<Map<String, dynamic>>> fetchSubjectCategories() async {
+    // First load the tokens
+    await loadTokens();
+
     final url =
         Uri.parse('https://api.mwalimufinder.com/api/v1/subjects/categories/');
     _isLoading = true;
@@ -774,14 +801,13 @@ class AuthProvider with ChangeNotifier {
       final response = await http.get(
         url,
         headers: {
-          'Authorization': 'Bearer $_accessToken', // Include the access token
+          'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
         },
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
-        // Map the response to a list of subject categories
         List<Map<String, dynamic>> categories = responseData.map((category) {
           return {
             'id': category['id'],
@@ -796,7 +822,7 @@ class AuthProvider with ChangeNotifier {
         }).toList();
         _isLoading = false;
         notifyListeners();
-        return categories; // Return the list of subject categories
+        return categories;
       } else {
         _errorMessage =
             "Failed to fetch subject categories. Status Code: ${response.statusCode}";
@@ -809,10 +835,11 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
 
-    return []; // Return an empty list on failure
+    return [];
   }
 
   Future<Map<String, dynamic>?> fetchUserData() async {
+    await loadTokens();
     final url =
         Uri.parse('https://api.mwalimufinder.com/api/v1/users/teacher/');
     _isLoading = true;

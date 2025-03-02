@@ -6,9 +6,31 @@ import 'package:we_teach/presentation/features/auth/profile/screens/add_qualific
 import 'package:we_teach/presentation/features/auth/profile/screens/added_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
 import 'dart:io'; // Import for File
+import 'package:we_teach/services/secure_storage_service.dart';
+import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 
-class AddProfilePhotoScreen extends StatelessWidget {
+class AddProfilePhotoScreen extends StatefulWidget {
   const AddProfilePhotoScreen({super.key});
+
+  @override
+  State<AddProfilePhotoScreen> createState() => _AddProfilePhotoScreenState();
+}
+
+class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('AddProfilePhotoScreen');
+    // Initialize auth state
+    _initializeAuthState();
+  }
+
+  Future<void> _initializeAuthState() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadTokens(); // Load tokens when screen initializes
+  }
 
   Future<void> _pickImage(BuildContext context) async {
     final ImagePicker _picker = ImagePicker();

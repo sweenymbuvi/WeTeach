@@ -8,6 +8,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class SignInNumberScreen extends StatefulWidget {
   const SignInNumberScreen({super.key});
@@ -21,6 +22,14 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _completePhoneNumber = '';
+  final SecureStorageService _secureStorageService = SecureStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Store the last visited screen
+    _secureStorageService.storeLastVisitedScreen('SignInNumberScreen');
+  }
 
   @override
   void dispose() {
@@ -40,7 +49,8 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.push(
+              context, MaterialPageRoute(builder: (context) => SignInScreen())),
         ),
       ),
       body: Column(

@@ -6,7 +6,9 @@ import 'package:we_teach/presentation/features/auth/signup/provider/auth_provide
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/signup_number.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/presentation/features/auth/welcome/screens/welcome_screen.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -18,6 +20,13 @@ class CreateAccountScreen extends StatefulWidget {
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool isAgreed = false;
   final TextEditingController emailController = TextEditingController();
+  final SecureStorageService _secureStorageService = SecureStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    _secureStorageService.storeLastVisitedScreen('CreateAccountScreen');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +38,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => WelcomeScreen()));
           },
         ),
         elevation: 0,

@@ -7,6 +7,7 @@ import 'package:we_teach/data/repositories/auth/auth_repo.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/finished_profile.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart'; // Import SecureStorageService
 
 class AddLocationScreen extends StatefulWidget {
   const AddLocationScreen({super.key});
@@ -25,23 +26,31 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   @override
   void initState() {
     super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('AddLocationScreen');
     _loadCounties(); // Load counties when the widget is initialized
   }
 
   Future<void> _loadCounties() async {
     try {
-      // Fetch counties from the AuthProvider
-      final accessToken =
-          Provider.of<AuthProvider>(context, listen: false).accessToken;
-      List<Map<String, String>> fetchedCounties =
-          await AuthRepository.fetchCounties(accessToken!);
-      setState(() {
-        counties = Map.fromIterable(
-          fetchedCounties,
-          key: (county) => county['name'], // Use county name as the key
-          value: (county) => county['id'], // Use county ID as the value
-        ); // Update the counties map
-      });
+      // Get the AuthProvider instance
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      // Ensure tokens are loaded
+      await authProvider.loadTokens();
+      // Get the access token using the getter
+      final accessToken = authProvider.accessToken;
+
+      if (accessToken != null) {
+        List<Map<String, String>> fetchedCounties =
+            await AuthRepository.fetchCounties(accessToken);
+        setState(() {
+          counties = Map.fromIterable(
+            fetchedCounties,
+            key: (county) => county['name'], // Use county name as the key
+            value: (county) => county['id'], // Use county ID as the value
+          );
+        });
+      }
     } catch (e) {
       // Handle any errors that occur during fetching
       print("Error fetching counties: $e");
@@ -50,22 +59,26 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
   Future<void> _loadSubCounties(String countyId) async {
     try {
-      // Fetch the access token
-      final accessToken =
-          Provider.of<AuthProvider>(context, listen: false).accessToken;
+      // Get the AuthProvider instance
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      // Ensure tokens are loaded
+      await authProvider.loadTokens();
+      // Get the access token using the getter
+      final accessToken = authProvider.accessToken;
 
-      // Fetch sub-counties based on the selected county
-      List<Map<String, String>> fetchedSubCounties =
-          await AuthRepository.fetchSubCounties(countyId, accessToken!);
-      setState(() {
-        subCountyIds = Map.fromIterable(
-          fetchedSubCounties,
-          key: (subCounty) =>
-              subCounty['name'], // Use sub-county name as the key
-          value: (subCounty) =>
-              subCounty['id'], // Use sub-county ID as the value
-        ); // Update the sub-county IDs map
-      });
+      if (accessToken != null) {
+        List<Map<String, String>> fetchedSubCounties =
+            await AuthRepository.fetchSubCounties(countyId, accessToken);
+        setState(() {
+          subCountyIds = Map.fromIterable(
+            fetchedSubCounties,
+            key: (subCounty) =>
+                subCounty['name'], // Use sub-county name as the key
+            value: (subCounty) =>
+                subCounty['id'], // Use sub-county ID as the value
+          );
+        });
+      }
     } catch (e) {
       // Handle any errors that occur during fetching
       print("Error fetching sub-counties: $e");
@@ -76,8 +89,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   Widget build(BuildContext context) {
     final authProvider =
         Provider.of<AuthProvider>(context); // Access the auth provider
-    final userId =
-        authProvider.userId; // Get the user ID from the auth provider
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -260,9 +271,20 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   int countyIdInt = int.parse(countyId); // Convert to int
                   int subCountyIdInt = int.parse(subCountyId); // Convert to int
 
-                  // Assuming you have the userId available
-                  int userId = authProvider
-                      .userId!; // Get the user ID from the auth provider
+                  // Retrieve user ID from secure storage
+                  final secureStorageService = SecureStorageService();
+                  final userId = await secureStorageService.getUserId();
+
+                  // Check if userId is null
+                  if (userId == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text("User  ID not found. Please log in again."),
+                      ),
+                    );
+                    return;
+                  }
 
                   // Call the updateTeacherProfile method
                   final success = await Provider.of<AuthProvider>(context,

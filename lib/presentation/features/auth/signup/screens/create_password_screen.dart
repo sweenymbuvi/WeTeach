@@ -6,15 +6,14 @@ import 'package:we_teach/presentation/features/auth/signup/provider/auth_provide
 import 'package:we_teach/presentation/features/auth/signup/widgets/password_field_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class CreatePasswordScreen extends StatefulWidget {
   final bool isFromSignup;
-  final int otp;
 
   const CreatePasswordScreen({
     super.key,
     required this.isFromSignup,
-    required this.otp,
   });
 
   @override
@@ -22,14 +21,35 @@ class CreatePasswordScreen extends StatefulWidget {
 }
 
 class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
+  int? otp; // Store OTP here
   bool isPasswordVisible = false;
   bool isConfirmPasswordVisible = false;
 
   final borderColor = Color(0x00476be8).withOpacity(0.11);
-
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  final SecureStorageService _secureStorageService = SecureStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('CreatePasswordScreen');
+    // Initialize auth state
+    _initializeAuthState();
+  }
+
+  Future<void> _initializeAuthState() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadTokens(); // Load tokens when screen initializes
+    _loadOtp(); // Load OTP after initializing auth state
+  }
+
+  Future<void> _loadOtp() async {
+    otp = await _secureStorageService.getOtpCode();
+    setState(() {}); // Update the state to reflect the loaded OTP
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +184,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                             }
 
                             bool result = await authProvider.setPassword(
-                              otpCode: widget.otp,
+                              otpCode: otp ?? 0, // Use the loaded OTP
                               password: passwordController.text.trim(),
                               password2: confirmPasswordController.text.trim(),
                             );

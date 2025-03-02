@@ -7,14 +7,34 @@ import 'package:we_teach/presentation/features/auth/profile/widgets/profile_butt
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'dart:io';
-
+import 'package:we_teach/services/secure_storage_service.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart'; // Import for File
 
-class ProfilePhotoAddedScreen extends StatelessWidget {
+class ProfilePhotoAddedScreen extends StatefulWidget {
   final String imagePath; // Add a field to hold the image path
 
   const ProfilePhotoAddedScreen(
       {super.key, required this.imagePath}); // Update constructor
+
+  @override
+  State<ProfilePhotoAddedScreen> createState() =>
+      _ProfilePhotoAddedScreenState();
+}
+
+class _ProfilePhotoAddedScreenState extends State<ProfilePhotoAddedScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Store the last visited screen
+    // SecureStorageService().storeLastVisitedScreen('ProfilePhotoAddedScreen');
+    // Initialize auth state
+    _initializeAuthState();
+  }
+
+  Future<void> _initializeAuthState() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadTokens(); // Load tokens when screen initializes
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +116,8 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: Color(0xFFFDFDFF),
-                    backgroundImage: FileImage(File(
-                        imagePath)), // Use FileImage to display the selected image
+                    backgroundImage: FileImage(File(widget
+                        .imagePath)), // Use FileImage to display the selected image
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   Row(
@@ -129,13 +149,27 @@ class ProfilePhotoAddedScreen extends StatelessWidget {
                 CustomButton(
                   text: 'Proceed',
                   onPressed: () async {
+                    // Retrieve user ID from secure storage
+                    final secureStorageService = SecureStorageService();
+                    final userId = await secureStorageService.getUserId();
+
+                    // Check if userId is null
+                    if (userId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("User  ID not found. Please log in again."),
+                        ),
+                      );
+                      return;
+                    }
+
                     // Call the AuthProvider to update the profile with the image
                     final authProvider =
                         Provider.of<AuthProvider>(context, listen: false);
                     bool success = await authProvider.updateTeacherProfile(
-                      userId: authProvider
-                          .userId!, // Assuming userId is available in AuthProvider
-                      image: imagePath, // Pass the selected image path
+                      userId: userId, // Use the retrieved user ID
+                      image: widget.imagePath, // Pass the selected image path
                     );
 
                     if (success) {

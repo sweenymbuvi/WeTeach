@@ -7,7 +7,8 @@ import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
-import 'package:we_teach/presentation/shared/widgets/my_button.dart'; // Add this import
+import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class AccountProfileScreen extends StatefulWidget {
   const AccountProfileScreen({super.key});
@@ -33,6 +34,20 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
   final TextEditingController bioController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   String _completePhoneNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('AccountProfileScreen');
+    // Initialize auth state
+    _initializeAuthState();
+  }
+
+  Future<void> _initializeAuthState() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadTokens(); // Load tokens when screen initializes
+  }
 
   Widget buildSectionTitle(String title) {
     return Material(
@@ -308,11 +323,29 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                                   return;
                                 }
 
+                                // Retrieve user ID and email from secure storage
+                                final secureStorageService =
+                                    SecureStorageService();
+                                final userId =
+                                    await secureStorageService.getUserId();
+                                final userEmail =
+                                    await secureStorageService.getEmail();
+
+                                // Check if userId or userEmail is null
+                                if (userId == null || userEmail == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          "User  ID or email not found. Please log in again."),
+                                    ),
+                                  );
+                                  return;
+                                }
+
                                 // Call the createTeacherProfile method
                                 final success =
                                     await authProvider.createTeacherProfile(
-                                  userId: authProvider
-                                      .userId!, // User ID from "Set Password"
+                                  userId: userId, // Use the retrieved user ID
                                   fullName: fullNameController.text,
                                   phoneNumber:
                                       _completePhoneNumber, // Use the complete phone number

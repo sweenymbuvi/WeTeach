@@ -6,6 +6,7 @@ import 'package:we_teach/presentation/features/auth/profile/screens/add_location
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class QualificationsScreen extends StatefulWidget {
   const QualificationsScreen({super.key});
@@ -23,9 +24,18 @@ class _QualificationsScreenState extends State<QualificationsScreen> {
   @override
   void initState() {
     super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('QualificationsScreen');
+    // Initialize auth state
+    _initializeAuthState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchSubjectCategories();
     });
+  }
+
+  Future<void> _initializeAuthState() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadTokens(); // Load tokens when screen initializes
   }
 
   Future<void> _fetchSubjectCategories() async {
@@ -190,11 +200,22 @@ class _QualificationsScreenState extends State<QualificationsScreen> {
                         onPressed: !authProvider.isLoading &&
                                 selectedSubjects.isNotEmpty
                             ? () async {
-                                final authProvider = Provider.of<AuthProvider>(
-                                    context,
-                                    listen: false);
-                                int userId = authProvider
-                                    .userId!; // Ensure userId is available
+                                // Retrieve user ID from secure storage
+                                final secureStorageService =
+                                    SecureStorageService();
+                                final userId =
+                                    await secureStorageService.getUserId();
+
+                                // Check if userId is null
+                                if (userId == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          "User  ID not found. Please log in again."),
+                                    ),
+                                  );
+                                  return;
+                                }
 
                                 // Convert selected subjects to qualification IDs
                                 List<int> selectedQualificationIds =
@@ -204,9 +225,12 @@ class _QualificationsScreenState extends State<QualificationsScreen> {
                                 }).toList();
 
                                 // Call the updateTeacherProfile method
+                                final authProvider = Provider.of<AuthProvider>(
+                                    context,
+                                    listen: false);
                                 final success =
                                     await authProvider.updateTeacherProfile(
-                                  userId: userId,
+                                  userId: userId, // Use the retrieved user ID
                                   qualifications:
                                       selectedQualificationIds, // Pass the selected qualifications
                                 );

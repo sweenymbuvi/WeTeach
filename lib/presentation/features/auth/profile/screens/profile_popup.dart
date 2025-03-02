@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
 import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart'; // Import SecureStorageService
 
 class ProfilePopup extends StatefulWidget {
   const ProfilePopup({super.key});
@@ -16,6 +17,8 @@ class _ProfilePopupState extends State<ProfilePopup> {
   @override
   void initState() {
     super.initState();
+    // Store the last visited screen
+    SecureStorageService().storeLastVisitedScreen('ProfilePopup');
     // Show the bottom sheet automatically when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showBottomSheet();

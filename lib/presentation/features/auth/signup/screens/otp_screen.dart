@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_password_screen.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
+import 'package:we_teach/services/secure_storage_service.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final bool isFromSignIn;
@@ -33,11 +34,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   int _resendCountdown = 30;
   late Timer _timer;
   bool _canResend = false;
+  final SecureStorageService _secureStorageService = SecureStorageService();
 
   @override
   void initState() {
     super.initState();
     _startResendTimer();
+    _secureStorageService.storeLastVisitedScreen('OtpVerificationScreen');
   }
 
   @override
@@ -110,39 +113,45 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   Future<void> _submitOtp(BuildContext context) async {
     String otp = _controllers.map((controller) => controller.text).join('');
+
     if (otp.length == 6) {
       final int otpCode = int.parse(otp);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       bool isSuccess = await authProvider.confirmOtp(otpCode: otpCode);
+
       if (isSuccess) {
+        // Store OTP securely for all flows
+        await _secureStorageService.storeOtpCode(otpCode);
+
         if (widget.isFromRecoverPassword) {
+          // Navigate to Create Password Screen from Forgot Password
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  CreatePasswordScreen(isFromSignup: false, otp: otpCode),
+              builder: (context) => CreatePasswordScreen(isFromSignup: false),
             ),
           );
         } else if (widget.isFromSignIn) {
-          // Handle sign-in verification logic here
+          // Handle sign-in verification logic here if needed
         } else if (widget.isFromSignupWithEmail) {
-          // For sign-up with email and phone number, navigate to CreatePasswordScreen
+          // Navigate to Create Password Screen for Sign Up with Email
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => CreatePasswordScreen(
-                isFromSignup: true, // Adjust based on your logic
-                otp: otpCode, // Pass OTP here
+                isFromSignup: true,
               ),
             ),
           );
         } else {
+          // Fallback for other flows
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  CreatePasswordScreen(isFromSignup: true, otp: otpCode),
+              builder: (context) => CreatePasswordScreen(
+                isFromSignup: true,
+              ),
             ),
           );
         }
@@ -150,8 +159,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         // Show error if OTP confirmation fails
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text(authProvider.errorMessage ?? "Failed to verify OTP")),
+            content: Text(authProvider.errorMessage ?? "Failed to verify OTP"),
+          ),
         );
       }
     } else {
