@@ -38,8 +38,19 @@ class PersonalInfoProvider with ChangeNotifier {
       }
 
       final userData = await _profileRepository.fetchUserData(accessToken);
+      print("Raw API Response: $userData");
+
       _userData = userData;
       print("Personal Info Fetched Successfully: $_userData");
+
+      // Print each value separately to check if they are set correctly
+      print("User ID: ${_userData?['user_id']}");
+      print("Teacher ID: ${_userData?['teacher_id']}");
+      print("Full Name: ${_userData?['full_name']}");
+      print("Phone Number: ${_userData?['phone_number']}");
+      print("Email: ${_userData?['primary_email']}");
+      print("County : ${_userData?['county']}");
+      print("Sub County : ${_userData?['sub_county']}");
     } catch (error) {
       _errorMessage = error.toString();
       print("FetchPersonalInfo Error: $error");
@@ -101,18 +112,10 @@ class PersonalInfoProvider with ChangeNotifier {
   // Update personal information
   Future<bool> updatePersonalInfo({
     String? fullName,
-    int? experience,
     String? phoneNumber,
     String? primaryEmail,
-    String? bio,
-    double? latitude,
-    double? longitude,
-    String? formattedAddress,
-    bool? isActive,
-    int? institutionLevel,
     int? county,
     int? subCounty,
-    List<int>? qualifications,
     String? image,
   }) async {
     _isLoading = true;
@@ -142,40 +145,16 @@ class PersonalInfoProvider with ChangeNotifier {
       final int userId = _userData!['user_id'];
       final int teacherId = _userData!['teacher_id'];
 
-      // Update user email if provided
-      if (primaryEmail != null && primaryEmail.isNotEmpty) {
-        print("Updating user email to: $primaryEmail");
-        final emailUpdated = await _profileRepository.updateUserData(
-          accessToken: accessToken,
-          userId: userId,
-          newEmail: primaryEmail,
-        );
-
-        if (!emailUpdated) {
-          _errorMessage = "Failed to update email.";
-          print("Update Email Error: $_errorMessage");
-          return false;
-        }
-      }
-
       // Update teacher profile
       final success = await _profileRepository.updateTeacherProfile(
         accessToken: accessToken,
         userId: userId,
         teacherId: teacherId,
         fullName: fullName,
-        experience: experience,
         phoneNumber: phoneNumber,
         primaryEmail: primaryEmail,
-        bio: bio,
-        latitude: latitude,
-        longitude: longitude,
-        formattedAddress: formattedAddress,
-        isActive: isActive,
-        institutionLevel: institutionLevel,
         county: county,
         subCounty: subCounty,
-        qualifications: qualifications,
         image: image,
       );
 
