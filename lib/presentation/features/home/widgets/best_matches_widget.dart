@@ -75,7 +75,7 @@ class BestMatchesSection extends StatelessWidget {
               timePosted: job['timePosted'],
               location: job['location'],
               schoolName: job['schoolName'],
-              isSaved: job['isSaved'],
+              //isSaved: job['isSaved'],
             );
           },
         ),

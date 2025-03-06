@@ -94,7 +94,6 @@ class _AllJobsScreenState extends State<AllJobsScreen> {
                                         '${jobData['sub_county'] ?? ''}, ${jobData['county'] ?? 'Unknown'}',
                                     schoolName: jobData['school_name'] ??
                                         'Unknown School',
-                                    isSaved: false,
                                   );
                                 },
                               )

@@ -53,7 +53,7 @@ class LocationSection extends StatelessWidget {
             title,
             style: GoogleFonts.inter(
               fontSize: 14,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
               color: const Color(0xFF1F1F1F),
             ),
           ),

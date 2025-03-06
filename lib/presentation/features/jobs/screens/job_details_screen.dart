@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/presentation/features/home/home_screen/provider/save_job_provider.dart';
 import 'package:we_teach/presentation/features/jobs/provider/view_job_provider.dart';
 import 'package:we_teach/presentation/features/jobs/widgets/about_job.dart';
 import 'package:we_teach/presentation/features/jobs/widgets/application_section.dart';
@@ -102,60 +103,84 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   }
 
   Widget _buildBottomButtons() {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF5F5F5), width: 1)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                fixedSize: const Size(120, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                side: const BorderSide(color: Color(0xFFF5F5F5)),
-              ),
-              child: Text(
-                'Saved',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF000EF8),
-                ),
-              ),
-            ),
+    return Consumer<JobSaveProvider>(
+      builder: (context, saveProvider, child) {
+        final bool isJobSaved = saveProvider.isJobSaved(widget.jobId);
+
+        return Container(
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: Color(0xFFF5F5F5), width: 1)),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                fixedSize: const Size(120, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    // Toggle save/unsave job when button is pressed
+                    saveProvider.toggleSaveJob(widget.jobId);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    fixedSize: const Size(120, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(
+                      color: isJobSaved
+                          ? const Color(0xFF000EF8)
+                          : const Color(0xFFF5F5F5),
+                    ),
+                    backgroundColor:
+                        isJobSaved ? const Color(0xFFEEF0FF) : Colors.white,
+                  ),
+                  child: saveProvider.isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFF000EF8),
+                          ),
+                        )
+                      : Text(
+                          isJobSaved ? 'Saved' : 'Save',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF000EF8),
+                          ),
+                        ),
                 ),
-                side: const BorderSide(color: Color(0xFFF5F5F5)),
               ),
-              child: Text(
-                'Call School',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF000EF8),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    fixedSize: const Size(120, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: const BorderSide(color: Color(0xFFF5F5F5)),
+                  ),
+                  child: Text(
+                    'Call School',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF000EF8),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

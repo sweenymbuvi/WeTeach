@@ -168,4 +168,41 @@ class HomeRepository {
       return "Just now";
     }
   }
+
+// Save job method
+  Future<bool> saveJob(int userId, int jobId, String accessToken) async {
+    final url = Uri.parse('$jobsBaseUrl/saves/');
+
+    try {
+      print("Sending API Request to: $url");
+      print("Request Headers: {");
+      print("Authorization: Bearer $accessToken");
+      print("Content-Type: application/json");
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'owner': userId,
+          'job': jobId,
+        }),
+      );
+
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true; // Job saved successfully
+      } else {
+        final responseData = jsonDecode(response.body);
+        throw Exception(responseData['message'] ?? "Failed to save job.");
+      }
+    } catch (error) {
+      print("Error: $error");
+      throw Exception("An error occurred while saving the job: $error");
+    }
+  }
 }

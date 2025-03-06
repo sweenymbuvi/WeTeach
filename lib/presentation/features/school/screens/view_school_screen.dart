@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:we_teach/constants/constants.dart';
+import 'package:we_teach/presentation/features/my_jobs/screens/my_jobs_screen.dart';
 import 'package:we_teach/presentation/features/school/provider/view_school_provider.dart';
 import 'package:we_teach/presentation/features/school/widgets/about_school_section.dart';
 import 'package:we_teach/presentation/features/school/widgets/contacts_section.dart';
@@ -42,6 +46,40 @@ class _ViewSchoolScreenState extends State<ViewSchoolScreen> {
         return const GallerySection();
       default:
         return Container();
+    }
+  }
+
+  void onShareClicked() {
+    Share.share(
+      "Check out this awesome app!\nDownload it from the Play Store: ${Constants.playStoreLink}",
+    );
+  }
+
+  // Updated method to fix phone call issue
+  void _callSchool(String phoneNumber) async {
+    // Format the phone number correctly (ensure it has no spaces)
+    String formattedNumber = phoneNumber.replaceAll(' ', '');
+
+    // Try using the tel: URI scheme first
+    final Uri phoneUri = Uri.parse('tel:$formattedNumber');
+
+    try {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        // Fallback to the older method if the first approach fails
+        if (await canLaunch('tel:$formattedNumber')) {
+          await launch('tel:$formattedNumber');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Could not launch phone dialer")),
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error making call: $e")),
+      );
     }
   }
 
@@ -93,7 +131,7 @@ class _ViewSchoolScreenState extends State<ViewSchoolScreen> {
         actions: [
           IconButton(
             icon: SvgPicture.asset("assets/svg/share_school.svg"),
-            onPressed: () {},
+            onPressed: onShareClicked,
           ),
         ],
       ),
@@ -118,6 +156,14 @@ class _ViewSchoolScreenState extends State<ViewSchoolScreen> {
                         width: 115,
                         height: 115,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 115,
+                            height: 115,
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.school, color: Colors.grey),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -157,64 +203,76 @@ class _ViewSchoolScreenState extends State<ViewSchoolScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomButtons(),
-    );
-  }
-
-  Widget _buildBottomButtons() {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF5F5F5), width: 1)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                fixedSize: const Size(120, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyJobsScreen(),
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  fixedSize: const Size(120, 56),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  side: const BorderSide(color: Color(0xFFF5F5F5)),
                 ),
-                side: const BorderSide(color: Color(0xFFF5F5F5)),
-              ),
-              child: Text(
-                'View Jobs',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF000EF8),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                fixedSize: const Size(120, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                side: const BorderSide(color: Color(0xFFF5F5F5)),
-              ),
-              child: Text(
-                'Call School',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF000EF8),
+                child: Text(
+                  'View Jobs',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF000EF8),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () {
+                  final phoneNumber = schoolProvider.jobDetails?['school']
+                          ['phone_number'] ??
+                      'N/A';
+                  if (phoneNumber != 'N/A') {
+                    _callSchool(phoneNumber);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Phone number not available")),
+                    );
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  fixedSize: const Size(120, 56),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  side: const BorderSide(color: Color(0xFFF5F5F5)),
+                ),
+                child: Text(
+                  'Call School',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF000EF8),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
