@@ -5,12 +5,14 @@ class ActionButtons extends StatelessWidget {
   final VoidCallback onDiscard;
   final VoidCallback onSave;
   final bool isLoading; // Optional loading state
+  final String saveButtonText; // New parameter for button text
 
   const ActionButtons({
     Key? key,
     required this.onDiscard,
     required this.onSave,
     this.isLoading = false, // Default to false if not provided
+    this.saveButtonText = "Save Changes", // Default text
   }) : super(key: key);
 
   @override
@@ -59,11 +61,11 @@ class ActionButtons extends StatelessWidget {
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
                   ),
                 )
               : Text(
-                  "Save Changes",
+                  saveButtonText, // Use the new parameter for button text
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Add this package to your pubspec.yaml
 import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
+import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
 import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
 import 'package:we_teach/services/secure_storage_service.dart'; // Import SecureStorageService
@@ -119,6 +120,11 @@ class _ProfilePopupState extends State<ProfilePopup> {
                     onPressed: () {
                       // Add your action here
                       Navigator.pop(context); // Close the bottom sheet
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  TeacherLiveProfileScreen()));
                     },
                   ),
                   SizedBox(height: 10),

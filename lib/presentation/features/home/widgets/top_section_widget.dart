@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/home/home_screen/provider/user_details_provider.dart';
 import 'package:we_teach/presentation/features/home/widgets/profile_status_card.dart';
+import 'package:we_teach/presentation/features/search/screens/job_search_screen.dart';
 
 class TopSection extends StatelessWidget {
   final bool showProfileStatus; // Add a flag to show/hide ProfileStatusCard
@@ -87,62 +88,73 @@ class TopSection extends StatelessWidget {
             // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search for jobs",
-                  hintStyle: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF828282),
-                    fontFamily: 'Inter',
-                  ),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: SvgPicture.asset(
-                      'assets/svg/lens.svg',
-                      width: 24,
-                      height: 24,
-                    ),
-                  ),
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/svg/rectangle.svg',
-                          width: 56,
-                          height: 40,
-                        ),
-                        SvgPicture.asset(
-                          'assets/svg/filter.svg',
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => JobSearchScreen()),
+                  );
+                },
+                child: AbsorbPointer(
+                  // Prevents keyboard from opening in the current screen
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search for jobs",
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF828282),
+                        fontFamily: 'Inter',
+                      ),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: SvgPicture.asset(
+                          'assets/svg/lens.svg',
                           width: 24,
                           height: 24,
                         ),
-                      ],
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: const Color(0xFFFFFFFF), // White background
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFBDBDBD),
-                      width: 1.0,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFBDBDBD),
-                      width: 1.0,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFBDBDBD),
-                      width: 1.0,
+                      ),
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/svg/rectangle.svg',
+                              width: 56,
+                              height: 40,
+                            ),
+                            SvgPicture.asset(
+                              'assets/svg/filter.svg',
+                              width: 24,
+                              height: 24,
+                            ),
+                          ],
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFFFFFFF),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFBDBDBD),
+                          width: 1.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFBDBDBD),
+                          width: 1.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFBDBDBD),
+                          width: 1.0,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -153,7 +165,10 @@ class TopSection extends StatelessWidget {
 
             // Conditionally show Profile Status Card
             if (showProfileStatus)
-              const ProfileStatusCard(isProfileLive: false),
+              ProfileStatusCard(
+                //isProfileLive: false, // Set this based on your logic
+                parentContext: context, // Pass the parent context here
+              ),
           ],
         ),
       ],
