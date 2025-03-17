@@ -10,6 +10,8 @@ class SecureStorageService {
   static const String _teacherIdKey = 'teacher_id';
   static const String _emailKey = 'user_email';
   static const String _otpKey = 'otp_code';
+  static const String _processedNotificationIdsKey =
+      'processed_notification_ids';
 
   // Store access token
   Future<void> storeAccessToken(String token) async {
@@ -143,5 +145,15 @@ class SecureStorageService {
 
   Future<void> deleteOtpCode() async {
     await _storage.delete(key: _otpKey);
+  }
+
+  // Store processed notification IDs
+  Future<void> storeProcessedNotificationIds(String ids) async {
+    await _storage.write(key: _processedNotificationIdsKey, value: ids);
+  }
+
+  // Get processed notification IDs
+  Future<String?> getProcessedNotificationIds() async {
+    return await _storage.read(key: _processedNotificationIdsKey);
   }
 }
