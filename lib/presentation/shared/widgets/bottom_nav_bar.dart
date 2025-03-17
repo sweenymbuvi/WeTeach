@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
 import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
 import 'package:we_teach/presentation/features/my_jobs/screens/my_jobs_screen.dart';
+import 'package:we_teach/presentation/features/notifications/screens/notification_screen.dart';
 import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
 import 'package:we_teach/presentation/features/publicity_history/screens/publicity_history_screen.dart';
 
@@ -51,6 +52,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
             break;
           case 3:
             // Navigate to Notifications screen (implement this screen)
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => NotificationsScreen()),
+            );
             break;
           case 4:
             Navigator.pushReplacement(

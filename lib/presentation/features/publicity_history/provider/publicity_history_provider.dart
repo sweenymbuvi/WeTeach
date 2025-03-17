@@ -7,12 +7,12 @@ class PublicityHistoryProvider extends ChangeNotifier {
   bool _isLoading = false;
   Map<String, dynamic>? _userData;
   String? _errorMessage;
-  bool _shouldShowProfilePopup = false; // New flag
+  bool _shouldShowProfilePopup = false;
 
   bool get isLoading => _isLoading;
   Map<String, dynamic>? get userData => _userData;
   String? get errorMessage => _errorMessage;
-  bool get shouldShowProfilePopup => _shouldShowProfilePopup; // Getter for UI
+  bool get shouldShowProfilePopup => _shouldShowProfilePopup;
 
   List<dynamic> get publicityHistory => _userData?["publicityHistory"] ?? [];
 

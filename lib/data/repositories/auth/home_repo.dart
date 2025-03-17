@@ -57,6 +57,17 @@ class HomeRepository {
               .map<String>((qualification) => qualification['name'] as String)
               .toList();
 
+          // Extract school information including accommodation and gender
+          String? accommodation = user['school']?['accommodation'];
+          String? gender = user['school']?['gender'];
+
+          // Extract teacher requirements
+          final List<dynamic> teacherRequirements =
+              user['teacher_requirements'] ?? [];
+          final List<String> requirementNames = teacherRequirements
+              .map<String>((requirement) => requirement['name'] as String)
+              .toList();
+
           return {
             'teacher_id': teacherId,
             'user_id': userId,
@@ -72,6 +83,10 @@ class HomeRepository {
             'institution_level_name': institutionLevel['name'],
             'primary_email': user['primary_email'],
             'phone_number': user['phone_number'],
+            // Added new fields
+            'accommodation': accommodation,
+            'gender': gender,
+            'teacher_requirements': requirementNames,
           };
         } else {
           throw Exception("No user data found.");
@@ -87,7 +102,6 @@ class HomeRepository {
     }
   }
 
-  // Fetch job data
   Future<List<Map<String, dynamic>>> fetchJobData(String accessToken) async {
     final url = Uri.parse('$jobsBaseUrl/all/');
 
@@ -103,7 +117,7 @@ class HomeRepository {
         url,
         headers: {
           'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', // Fixed syntax error here
         },
       );
 
@@ -113,10 +127,83 @@ class HomeRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
+
+        // Debugging: Print the raw response data
+        print("Raw Response Data: $responseData");
+
         return responseData.map<Map<String, dynamic>>((job) {
+          // Debugging: Print the raw job data
+          print("Raw Job Data: $job");
+
           // Extract creation time and format it
           String creationTime = job['creation_time'];
           String formattedCreationTime = _formatJoinedDate(creationTime);
+
+          // Extract school image URL and transform it if needed
+          String imageUrl = '';
+          if (job['school'] != null &&
+              job['school']['image'] != null &&
+              job['school']['image'].toString().isNotEmpty) {
+            String originalUrl = job['school']['image'];
+
+            // Replace localhost URLs with production URL
+            if (originalUrl.contains('localhost')) {
+              int mediaIndex = originalUrl.indexOf('/media/');
+              if (mediaIndex >= 0) {
+                String imagePath = originalUrl.substring(mediaIndex);
+                imageUrl = 'https://api.mwalimufinder.com$imagePath';
+              } else {
+                imageUrl = originalUrl;
+              }
+            } else {
+              imageUrl = originalUrl;
+            }
+          }
+
+          // Debugging: Print the extracted image URL
+          print("Extracted Image URL: $imageUrl");
+
+          // Extract teacher requirements names
+          List<String> teacherRequirements = [];
+          if (job['teacher_requirements'] != null) {
+            // Debugging: Print the raw teacher requirements data
+            print("Raw Teacher Requirements: ${job['teacher_requirements']}");
+
+            teacherRequirements =
+                (job['teacher_requirements'] as List).map((requirement) {
+              // Debugging: Print each requirement
+              print("Requirement: $requirement");
+
+              // Ensure the requirement is a map and contains the 'name' key
+              if (requirement is Map<String, dynamic> &&
+                  requirement.containsKey('name')) {
+                return requirement['name'].toString();
+              } else {
+                // Debugging: Print if the requirement is invalid
+                print("Invalid Requirement: $requirement");
+                return '';
+              }
+            }).toList();
+
+            // Debugging: Print the extracted teacher requirements names
+            print("Extracted Teacher Requirements Names: $teacherRequirements");
+          }
+
+          // Extract gender and accommodation
+          String gender = 'Unknown';
+          String accommodation = 'Unknown';
+          if (job['school'] != null) {
+            // Debugging: Print the raw school data
+            print("Raw School Data: ${job['school']}");
+
+            gender = job['school']['gender']?.toString() ?? 'Unknown';
+            accommodation =
+                job['school']['accommodation']?.toString() ?? 'Unknown';
+
+            // Debugging: Print the extracted gender and accommodation
+            print("Extracted Gender: $gender");
+            print("Extracted Accommodation: $accommodation");
+          }
 
           return {
             'id': job['id'],
@@ -132,8 +219,13 @@ class HomeRepository {
             'county': job['school']['county']['name'], // Extract county name
             'sub_county': job['school']['sub_county']
                 ['name'], // Extract sub-county name
+            'gender': gender, // Extract gender
+            'accommodation': accommodation, // Extract accommodation
+            'teacher_requirements':
+                teacherRequirements, // Extract teacher requirement names
             'creation_time':
                 formattedCreationTime, // Add formatted creation time
+            'image': imageUrl, // Add the transformed image URL
           };
         }).toList();
       } else {
