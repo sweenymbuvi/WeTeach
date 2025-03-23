@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/auth/profile/screens/add_qualifications.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/added_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
-import 'dart:io'; // Import for File
 import 'package:we_teach/services/secure_storage_service.dart';
-import 'package:provider/provider.dart';
-import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
+import 'package:we_teach/utils/image_utils.dart'; // Import the ImageUtils class
 
 class AddProfilePhotoScreen extends StatefulWidget {
   const AddProfilePhotoScreen({super.key});
@@ -23,51 +22,32 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
     super.initState();
     // Store the last visited screen
     SecureStorageService().storeLastVisitedScreen('AddProfilePhotoScreen');
-    // Initialize auth state
-    _initializeAuthState();
-  }
-
-  Future<void> _initializeAuthState() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.loadTokens(); // Load tokens when screen initializes
   }
 
   Future<void> _pickImage(BuildContext context) async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final image = await ImageUtils.pickImage();
 
     if (image != null) {
-      // If an image is selected, navigate to the ProfilePhotoAddedScreen
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfilePhotoAddedScreen(
-              imagePath: image.path), // Pass the image path
+          builder: (context) => ProfilePhotoAddedScreen(imagePath: image.path),
         ),
       );
     }
   }
 
   Future<void> _takePhoto(BuildContext context) async {
-    // Initialize the ImagePicker
-    final ImagePicker _picker = ImagePicker();
+    final image = await ImageUtils.takePhoto();
 
-    // Open the camera and allow the user to take a photo
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-
-    // Check if the user took a photo
     if (image != null) {
-      // Navigate to the next screen and pass the image path
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfilePhotoAddedScreen(
-            imagePath: image.path, // Pass the image path to the next screen
-          ),
+          builder: (context) => ProfilePhotoAddedScreen(imagePath: image.path),
         ),
       );
     } else {
-      // Handle the case where the user didn't take a photo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No photo was taken.')),
       );
@@ -78,7 +58,6 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     int currentPage = 1;
 
     return Scaffold(
@@ -157,7 +136,7 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
                     alignment: Alignment.center,
                     children: [
                       SvgPicture.asset(
-                        'assets/svg/circle.svg',
+                        Assets.svg.circle, // Use the generated asset class
                         height: 100,
                         width: 100,
                         fit: BoxFit.scaleDown,
@@ -166,9 +145,9 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
                         top: screenHeight * 0.02,
                         child: CircleAvatar(
                           radius: 40,
-                          backgroundColor: Color(0xFFFDFDFF),
+                          backgroundColor: const Color(0xFFFDFDFF),
                           child: SvgPicture.asset(
-                            'assets/svg/photo.svg',
+                            Assets.svg.photo, // Use the generated asset class
                             height: 25,
                             width: 25,
                             fit: BoxFit.scaleDown,
@@ -181,7 +160,7 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
                   Text(
                     "Passport size photo (Max size: 5mb)",
                     style: GoogleFonts.inter(
-                      color: Color(0xFF888888),
+                      color: const Color(0xFF888888),
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -190,23 +169,23 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
                     "No photo added",
                     style: GoogleFonts.inter(
                       fontSize: 16,
-                      color: Color(0xFF1F1F1F),
+                      color: const Color(0xFF1F1F1F),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Column(
               children: [
                 ProfileButton(
                   onPressed: () {
-                    _pickImage(context); // Call the method to pick an image
+                    _pickImage(context);
                   },
                   text: "Select from Gallery",
                   icon: SvgPicture.asset(
-                    'assets/svg/image.svg',
+                    Assets.svg.image, // Use the generated asset class
                     height: 24,
                     width: 24,
                     fit: BoxFit.scaleDown,
@@ -216,7 +195,7 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
                 SizedBox(height: screenHeight * 0.02),
                 ProfileButton(
                   onPressed: () {
-                    _takePhoto(context); // Call the method to take a new photo
+                    _takePhoto(context);
                   },
                   text: "Take new Photo",
                   icon: null,

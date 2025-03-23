@@ -18,15 +18,10 @@ import 'package:we_teach/presentation/features/home/home_screen/provider/save_jo
 import 'package:we_teach/presentation/features/home/home_screen/provider/user_details_provider.dart';
 import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
 import 'package:we_teach/presentation/features/jobs/provider/view_job_provider.dart';
-import 'package:we_teach/presentation/features/jobs/screens/job_details_screen.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/live_profile_provider.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/profile_details_provider.dart';
-import 'package:we_teach/presentation/features/live_profile/screens/public_payment_screen.dart';
-import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
 import 'package:we_teach/presentation/features/my_jobs/provider/my_jobs_provider.dart';
-import 'package:we_teach/presentation/features/my_jobs/screens/my_jobs_screen.dart';
 import 'package:we_teach/presentation/features/notifications/provider/notifications_provider.dart';
-import 'package:we_teach/presentation/features/notifications/screens/notification_screen.dart';
 import 'package:we_teach/presentation/features/payment/provider/job_payment_provider.dart';
 import 'package:we_teach/presentation/features/profile/change_password/provider/change_password_provider.dart';
 import 'package:we_teach/presentation/features/auth/onboarding/screens/onboarding_screen.dart';
@@ -36,12 +31,10 @@ import 'package:we_teach/presentation/features/profile/payment/provider/payment_
 import 'package:we_teach/presentation/features/profile/personal_info/provider/personal_info_provider.dart';
 import 'package:we_teach/presentation/features/profile/professional_details/provider/professional_details_provider.dart';
 import 'package:we_teach/presentation/features/publicity_history/provider/publicity_history_provider.dart';
-import 'package:we_teach/presentation/features/publicity_history/screens/publicity_history_screen.dart';
 import 'package:we_teach/presentation/features/school/provider/school_photos_provider.dart';
 import 'package:we_teach/presentation/features/school/provider/view_school_provider.dart';
-import 'package:we_teach/presentation/features/school/screens/view_school_screen.dart';
 import 'package:we_teach/presentation/features/search/provider/job_search_provider.dart';
-import 'package:we_teach/presentation/features/search/screens/job_search_screen.dart';
+import 'package:we_teach/presentation/theme/theme.dart';
 import 'package:we_teach/services/local_notification_service.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
@@ -89,6 +82,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme, // Set the theme
       home: _getInitialScreen(),
     );
   }
@@ -168,7 +162,7 @@ class MyApp extends StatelessWidget {
       case 'ProfilePopup': // Add this case for ProfilePopup
         return const ProfilePopup(); // Navigate to ProfilePopup
       default:
-        return OnboardingScreen();
+        return const OnboardingScreen();
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart'; // Import this for Provider
 import 'package:we_teach/data/repositories/auth/auth_repo.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/finished_profile.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
@@ -139,9 +140,9 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 prefixIcon: SvgPicture.asset(
-                  'assets/svg/location.svg',
-                  height: 5,
-                  width: 5,
+                  Assets.svg.location, // Use the generated asset class
+                  height: 20, // Adjusted height for better visibility
+                  width: 20, // Adjusted width for better visibility
                   fit: BoxFit.scaleDown,
                 ),
                 border: OutlineInputBorder(

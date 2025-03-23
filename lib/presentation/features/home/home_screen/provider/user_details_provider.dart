@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:we_teach/data/repositories/auth/home_repo.dart';
+import 'package:we_teach/data/repositories/home/home_repo.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
 class UserDetailsProvider with ChangeNotifier {

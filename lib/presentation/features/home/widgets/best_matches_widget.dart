@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/home/home_screen/screens/all_jobs_screen.dart';
 import 'package:we_teach/presentation/features/home/widgets/job_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -50,7 +51,7 @@ class BestMatchesSection extends StatelessWidget {
                     ),
                     const SizedBox(width: 5),
                     SvgPicture.asset(
-                      'assets/svg/arrow-right.svg',
+                      Assets.svg.arrowRight, // Use the generated asset class
                       width: 10,
                       height: 10,
                     ),

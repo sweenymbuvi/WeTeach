@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/profile_popup.dart';
 import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
 import 'package:we_teach/presentation/features/publicity_history/provider/publicity_history_provider.dart';
@@ -104,8 +105,10 @@ class _PublicityHistoryScreenState extends State<PublicityHistoryScreen> {
                                 padding: const EdgeInsets.only(right: 24),
                                 child: SvgPicture.asset(
                                   isActive
-                                      ? 'assets/svg/publicity_active.svg'
-                                      : 'assets/svg/publicity_inactive.svg',
+                                      ? Assets.svg
+                                          .publicityActive // Use the generated asset class for active
+                                      : Assets.svg
+                                          .publicityInactive, // Use the generated asset class for inactive
                                   width: 40,
                                   height: 40,
                                 ),

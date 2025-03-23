@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/profile/screens/add_qualifications.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
@@ -124,7 +125,7 @@ class _ProfilePhotoAddedScreenState extends State<ProfilePhotoAddedScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SvgPicture.asset(
-                        'assets/svg/tick.svg',
+                        Assets.svg.tick, // Use the generated asset class
                         height: 16,
                         width: 16,
                         fit: BoxFit.scaleDown,

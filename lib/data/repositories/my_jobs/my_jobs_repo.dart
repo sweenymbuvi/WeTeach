@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:we_teach/constants/app_urls.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
 class MyJobsRepository {
   final Dio _dio = Dio();
   final SecureStorageService _secureStorage = SecureStorageService();
-  final String _savedJobsUrl =
-      "https://api.mwalimufinder.com/api/v1/jobs/saves/";
-  final String _viewedJobsUrl =
-      "https://api.mwalimufinder.com/api/v1/jobs/user/viewed/";
-  final String _deleteSavedJobUrl =
-      "https://api.mwalimufinder.com/api/v1/jobs/saves/delete/";
+
+  // Use the URLs from AppUrls
+  final String _savedJobsUrl = AppUrls.savedJobsUrl;
+  final String _viewedJobsUrl = AppUrls.viewedJobsUrl;
+  final String _deleteSavedJobUrl = AppUrls.deleteSavedJobUrl;
 
   Future<List<Map<String, dynamic>>> fetchSavedJobs() async {
     try {
@@ -119,7 +119,7 @@ class MyJobsRepository {
         // Optionally, you can check the response message
         if (response.data is Map &&
             (response.data as Map)['message'] !=
-                'User Job Save deleted successfully') {
+                'User  Job Save deleted successfully') {
           throw Exception("Unexpected response message");
         }
 

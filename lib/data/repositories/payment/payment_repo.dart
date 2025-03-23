@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:we_teach/constants/app_urls.dart';
 
 class PaymentRepository {
-  final String baseUrl =
-      'https://api.mwalimufinder.com/api/v1/payments/user/methods/';
-  final String paymentUrl =
-      'https://api.mwalimufinder.com/api/v1/payments/mpesa/view/make/';
-  final String userUrl = 'https://api.mwalimufinder.com/api/v1/users/teacher/';
+  // Use the URLs from AppUrls
+  final String baseUrl = AppUrls.paymentMethodsUrl;
+  final String paymentUrl = AppUrls.paymentUrl;
+  final String userUrl = AppUrls.getTeacherDetails;
 
   // Fetch user data
   Future<Map<String, dynamic>?> fetchUserData(String accessToken) async {
@@ -21,8 +21,8 @@ class PaymentRepository {
         },
       );
 
-      print("Status Code: \${response.statusCode}");
-      print("Response Body: \${response.body}");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
@@ -105,7 +105,7 @@ class PaymentRepository {
       // Fetch user details to get the user ID
       final userData = await fetchUserData(accessToken);
       if (userData == null || !userData.containsKey('user_id')) {
-        throw Exception("User ID not found.");
+        throw Exception("User  ID not found.");
       }
 
       final int ownerId = userData['user_id'];
@@ -166,8 +166,7 @@ class PaymentRepository {
     required String accessToken,
     required int paymentId,
   }) async {
-    final url = Uri.parse(
-        'https://api.mwalimufinder.com/api/v1/payments/mpesa/confirm/$paymentId/');
+    final url = Uri.parse('${AppUrls.checkPaymentStatusUrl}$paymentId/');
 
     try {
       print("Checking Payment Status from: $url");

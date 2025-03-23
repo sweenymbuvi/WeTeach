@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/auth/profile/screens/profile_popup.dart';
 import 'package:provider/provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
@@ -65,7 +66,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                               userProfile!['image'].isNotEmpty
                           ? NetworkImage(
                               userProfile!['image']) // Use full image URL
-                          : AssetImage('assets/images/man.png')
+                          : AssetImage(Assets
+                                  .images.man.path) // Use generated asset class
                               as ImageProvider,
                     ),
 
@@ -103,7 +105,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: SvgPicture.asset(
-                                'assets/svg/location.svg',
+                                Assets.svg
+                                    .location, // Use the generated asset class
                                 height: 24,
                                 width: 24,
                                 fit: BoxFit.scaleDown,
@@ -137,7 +140,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: SvgPicture.asset(
-                                'assets/svg/time1.svg',
+                                Assets
+                                    .svg.time1, // Use the generated asset class
                                 height: 24,
                                 width: 24,
                                 fit: BoxFit.scaleDown,
@@ -171,7 +175,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: SvgPicture.asset(
-                                'assets/svg/book1.svg',
+                                Assets
+                                    .svg.book1, // Use the generated asset class
                                 height: 24,
                                 width: 24,
                                 fit: BoxFit.scaleDown,

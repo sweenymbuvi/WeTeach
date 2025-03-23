@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/profile/shared/widgets/action_buttons.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/text_field.dart';
 
@@ -52,7 +53,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 16.0, top: 10),
             child: SvgPicture.asset(
-              'assets/svg/edit.svg',
+              Assets.svg.edit, // Use the generated asset class for edit icon
               height: 40,
               width: 40,
             ),
@@ -69,7 +70,8 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
               label: "Account Number",
               controller: _cardNumberController,
               isRequired: false,
-              assetImage: 'assets/images/logos_mastercard.png',
+              assetImage: Assets.images.logosMastercard
+                  .path, // Use the generated asset class for Mastercard logo
             ),
             SizedBox(height: 16),
             Row(

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:we_teach/data/repositories/auth/view_job_repo.dart';
+import 'package:we_teach/data/repositories/view_job/view_job_repo.dart';
 
 class ViewJobProvider extends ChangeNotifier {
   final ViewJobRepository _viewJobRepository = ViewJobRepository();

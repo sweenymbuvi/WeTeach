@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
 import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
 import 'package:we_teach/presentation/features/my_jobs/screens/my_jobs_screen.dart';
@@ -37,21 +38,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
             );
             break;
           case 1:
-            // Do nothing, already on My Jobs screen
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MyJobsScreen()),
             );
             break;
           case 2:
-            // Handle Apply icon tap (implement this action)
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => PublicityHistoryScreen()),
             );
             break;
           case 3:
-            // Navigate to Notifications screen (implement this screen)
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => NotificationsScreen()),
@@ -72,23 +70,23 @@ class CustomBottomNavigationBar extends StatelessWidget {
       unselectedItemColor: const Color(0xFF5C5C5C),
       items: [
         _buildNavBarItem(
-          iconPath: 'assets/svg/nav/home.svg',
+          iconPath: Assets.svg.nav.home, // Use the generated asset class
           label: 'Home',
           index: 0,
         ),
         _buildNavBarItem(
-          iconPath: 'assets/svg/nav/bookmark.svg',
+          iconPath: Assets.svg.nav.bookmark, // Use the generated asset class
           label: 'My Jobs',
           index: 1,
         ),
         _buildApplyIcon(), // Special case for the Apply icon
         _buildNavBarItem(
-          iconPath: 'assets/svg/nav/bell.svg',
+          iconPath: Assets.svg.nav.bell, // Use the generated asset class
           label: 'Notifications',
           index: 3,
         ),
         _buildNavBarItem(
-          iconPath: 'assets/svg/nav/user.svg',
+          iconPath: Assets.svg.nav.user, // Use the generated asset class
           label: 'Profile',
           index: 4,
         ),
@@ -133,7 +131,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         padding:
             const EdgeInsets.only(top: 8.0), // Adjust for vertical alignment
         child: SvgPicture.asset(
-          'assets/svg/apply1.svg',
+          Assets.svg.apply1, // Use the generated asset class
           height: 40, // Same height as other icons
           width: 40, // Same width as other icons
         ),

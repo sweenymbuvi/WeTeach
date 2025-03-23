@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:we_teach/data/repositories/auth/school_repo.dart';
+import 'package:we_teach/data/repositories/school/school_repo.dart';
 
 class SchoolPhotosProvider extends ChangeNotifier {
   final ViewSchoolRepository _schoolRepository = ViewSchoolRepository();

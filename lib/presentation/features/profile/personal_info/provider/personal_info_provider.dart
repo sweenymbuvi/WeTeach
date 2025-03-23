@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:we_teach/data/repositories/auth/profile_repo.dart';
+import 'package:we_teach/data/repositories/profile/profile_repo.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
 class PersonalInfoProvider with ChangeNotifier {

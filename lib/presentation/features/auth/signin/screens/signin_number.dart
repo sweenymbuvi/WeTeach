@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/forgot_password/screens/forgot_password_screen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
@@ -168,7 +169,8 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: SvgPicture.asset(
-                                'assets/svg/lock.svg',
+                                Assets
+                                    .svg.lock, // Use the generated asset class
                                 height: 5,
                                 width: 5,
                                 fit: BoxFit.scaleDown,
@@ -389,7 +391,8 @@ class _SignInNumberScreenState extends State<SignInNumberScreen> {
                                   // Handle "Continue with Google"
                                 },
                                 icon: Image.asset(
-                                  'assets/images/google_icon.png',
+                                  Assets.images.googleIcon
+                                      .path, // Use the generated asset class
                                   height: 20,
                                 ),
                                 label: Text(

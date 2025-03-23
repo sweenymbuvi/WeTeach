@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 
 class NotificationTile extends StatefulWidget {
   final String title;
@@ -45,7 +46,8 @@ class _NotificationTileState extends State<NotificationTile> {
               alignment: Alignment.center,
               children: [
                 SvgPicture.asset(
-                  'assets/svg/ellipse.svg', // Ellipse background
+                  Assets
+                      .svg.ellipse, // Use the generated asset class for ellipse
                   width: 40,
                   height: 40,
                   colorFilter: const ColorFilter.mode(
@@ -54,7 +56,8 @@ class _NotificationTileState extends State<NotificationTile> {
                   ),
                 ),
                 SvgPicture.asset(
-                  'assets/svg/job_icon.svg', // Job icon
+                  Assets.svg
+                      .jobIcon, // Use the generated asset class for job icon
                   width: 24,
                   height: 24,
                 ),

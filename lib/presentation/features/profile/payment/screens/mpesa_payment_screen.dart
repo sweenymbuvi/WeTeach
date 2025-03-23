@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/profile/payment/provider/payment_provider.dart';
 import 'package:we_teach/presentation/features/profile/payment/screens/payment_options_screen.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/action_buttons.dart';
@@ -61,7 +62,7 @@ class _MpesaPaymentScreenState extends State<MpesaPaymentScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 16.0, top: 10),
             child: SvgPicture.asset(
-              'assets/svg/edit.svg',
+              Assets.svg.edit, // Use the generated asset class
               height: 40,
               width: 40,
             ),

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/live_profile/provider/profile_details_provider.dart';
 
 class TeacherContactsSection extends StatelessWidget {
@@ -23,9 +24,11 @@ class TeacherContactsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle("Email"),
-        _contactItem("assets/svg/email.svg", primaryEmail),
+        _contactItem(
+            Assets.svg.email, primaryEmail), // Use the generated asset class
         _sectionTitle("Phone Number"),
-        _contactItem("assets/svg/phone.svg", phoneNumber),
+        _contactItem(
+            Assets.svg.phone, phoneNumber), // Use the generated asset class
       ],
     );
   }
@@ -83,7 +86,7 @@ class TeacherContactsSection extends StatelessWidget {
         Clipboard.setData(ClipboardData(text: text));
       },
       child: SvgPicture.asset(
-        "assets/svg/copy.svg",
+        Assets.svg.copy, // Use the generated asset class
         width: 24,
         height: 24,
       ),

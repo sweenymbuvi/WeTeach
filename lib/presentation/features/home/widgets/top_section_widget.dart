@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/home/home_screen/provider/user_details_provider.dart';
 import 'package:we_teach/presentation/features/home/widgets/profile_status_card.dart';
 import 'package:we_teach/presentation/features/search/screens/job_search_screen.dart';
@@ -44,7 +45,8 @@ class TopSection extends StatelessWidget {
                             userDetailsProvider.userData?['image'] != null
                                 ? NetworkImage(
                                     userDetailsProvider.userData!['image'])
-                                : const AssetImage("assets/images/man.png")
+                                : AssetImage(Assets.images.man
+                                        .path) // Use the generated asset class
                                     as ImageProvider,
                       ),
                       const SizedBox(width: 10),
@@ -75,7 +77,7 @@ class TopSection extends StatelessWidget {
                     ],
                   ),
                   SvgPicture.asset(
-                    'assets/svg/live.svg',
+                    Assets.svg.live, // Use the generated asset class
                     width: 40,
                     height: 40,
                   ),
@@ -109,7 +111,7 @@ class TopSection extends StatelessWidget {
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: SvgPicture.asset(
-                          'assets/svg/lens.svg',
+                          Assets.svg.lens, // Use the generated asset class
                           width: 24,
                           height: 24,
                         ),
@@ -120,12 +122,14 @@ class TopSection extends StatelessWidget {
                           alignment: Alignment.center,
                           children: [
                             SvgPicture.asset(
-                              'assets/svg/rectangle.svg',
+                              Assets.svg
+                                  .rectangle, // Use the generated asset class
                               width: 56,
                               height: 40,
                             ),
                             SvgPicture.asset(
-                              'assets/svg/filter.svg',
+                              Assets
+                                  .svg.filter, // Use the generated asset class
                               width: 24,
                               height: 24,
                             ),

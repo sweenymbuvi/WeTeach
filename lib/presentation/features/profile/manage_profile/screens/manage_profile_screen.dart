@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/profile/change_password/screens/change_password_screen.dart';
 import 'package:we_teach/presentation/features/profile/payment/provider/payment_provider.dart';
 import 'package:we_teach/presentation/features/profile/payment/screens/add_payment_option%20screen.dart';
@@ -79,7 +80,8 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
               ),
               const SizedBox(height: 8),
               CustomListTile(
-                iconPath: 'assets/svg/work_outline.svg',
+                iconPath:
+                    Assets.svg.workOutline, // Use the generated asset class
                 title: "Professional Details",
                 onTap: () {
                   Navigator.push(
@@ -89,22 +91,22 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                 },
               ),
               CustomListTile(
-                iconPath: 'assets/svg/task.svg',
+                iconPath: Assets.svg.task, // Use the generated asset class
                 title: "My Jobs",
                 onTap: () {},
               ),
               CustomListTile(
-                iconPath: 'assets/svg/public.svg',
+                iconPath: Assets.svg.public, // Use the generated asset class
                 title: "Profile Publicity",
                 onTap: () {},
               ),
               CustomListTile(
-                iconPath: 'assets/svg/history.svg',
+                iconPath: Assets.svg.history, // Use the generated asset class
                 title: "Publicity History",
                 onTap: () {},
               ),
               CustomListTile(
-                iconPath: 'assets/svg/payment.svg',
+                iconPath: Assets.svg.payment, // Use the generated asset class
                 title: "Payments",
                 onTap: () async {
                   final paymentProvider =
@@ -141,7 +143,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                 },
               ),
               CustomListTile(
-                iconPath: 'assets/svg/password.svg',
+                iconPath: Assets.svg.password, // Use the generated asset class
                 title: "Change Password",
                 onTap: () {
                   Navigator.push(
@@ -162,22 +164,22 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
               ),
               const SizedBox(height: 8),
               CustomListTile(
-                iconPath: 'assets/svg/share.svg',
+                iconPath: Assets.svg.share, // Use the generated asset class
                 title: "Share App",
                 onTap: () {},
               ),
               CustomListTile(
-                iconPath: 'assets/svg/star.svg',
+                iconPath: Assets.svg.star, // Use the generated asset class
                 title: "Rate App",
                 onTap: () {},
               ),
               CustomListTile(
-                iconPath: 'assets/svg/privacy.svg',
+                iconPath: Assets.svg.privacy, // Use the generated asset class
                 title: "Terms of Use & Privacy Policy",
                 onTap: () {},
               ),
               CustomListTile(
-                iconPath: 'assets/svg/logout.svg',
+                iconPath: Assets.svg.logout, // Use the generated asset class
                 title: "Log Out",
                 onTap: () {},
               ),

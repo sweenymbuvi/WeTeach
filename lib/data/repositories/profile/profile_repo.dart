@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
+import 'package:we_teach/constants/app_urls.dart';
 
 class ProfileRepository {
-  final String baseUrl = "https://api.mwalimufinder.com/api/v1/users/";
+  // Use the URLs from AppUrls
+  final String baseUrl = AppUrls.userBaseUrl;
 
   // Fetch user data
   Future<Map<String, dynamic>?> fetchUserData(String accessToken) async {
-    final url = Uri.parse('$baseUrl/teacher/');
+    final url = Uri.parse('${baseUrl}teacher/');
 
     try {
       // Print request details
@@ -37,8 +39,8 @@ class ProfileRepository {
           final user = responseData[0];
 
           // Extract user and teacher IDs
-          final teacherId = user['id']; // This is the teacher profile ID (166)
-          final userId = user['user']['id']; // This is the user ID (360)
+          final teacherId = user['id']; // This is the teacher profile ID
+          final userId = user['user']['id']; // This is the user ID
 
           // Ensure the image URL is correctly formatted
           String? imageUrl = user['image'] != null
@@ -59,8 +61,8 @@ class ProfileRepository {
               .toList();
 
           return {
-            'teacher_id': teacherId, // Added teacherId
-            'user_id': userId, // Added userId
+            'teacher_id': teacherId,
+            'user_id': userId,
             'full_name': user['full_name'],
             'county': user['county']['name'],
             'sub_county': user['sub_county']['name'],
@@ -93,7 +95,7 @@ class ProfileRepository {
     required int userId,
     required String newEmail,
   }) async {
-    final url = Uri.parse('https://api.mwalimufinder.com/api/v1/users/user/');
+    final url = Uri.parse('${baseUrl}user/');
 
     try {
       // Print request details
@@ -116,12 +118,12 @@ class ProfileRepository {
       );
 
       // Print response details
-      print("Status Code: \${response.statusCode}");
-      print("Response Headers: \${response.headers}");
-      print("Response Body: \${response.body}");
+      print("Status Code: ${response.statusCode}");
+      print("Response Headers: ${response.headers}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        print("User email updated successfully!");
+        print("User  email updated successfully!");
         return true;
       } else {
         final responseData = jsonDecode(response.body);
@@ -136,7 +138,7 @@ class ProfileRepository {
 
   // Fetch counties
   Future<Map<String, String>> fetchCounties(String accessToken) async {
-    final url = Uri.parse('$baseUrl/counties/');
+    final url = Uri.parse(AppUrls.countiesUrl);
 
     try {
       final response = await http.get(
@@ -164,10 +166,10 @@ class ProfileRepository {
     }
   }
 
-// Fetch sub-counties
+  // Fetch sub-counties
   Future<Map<String, String>> fetchSubCounties(
       String accessToken, String countyId) async {
-    final url = Uri.parse('$baseUrl/sub-scounties/list/?county__id=$countyId');
+    final url = Uri.parse('${AppUrls.subCountiesUrl}?county__id=$countyId');
 
     try {
       final response = await http.get(
@@ -226,7 +228,7 @@ class ProfileRepository {
     required String newPassword,
     required String confirmPassword,
   }) async {
-    final url = Uri.parse('$baseUrl/user/password/change/');
+    final url = Uri.parse(AppUrls.changePasswordUrl);
 
     // Ensure that the required parameters are not null
     if (accessToken.isEmpty ||
@@ -310,7 +312,7 @@ class ProfileRepository {
     List<int>? qualifications,
     String? image,
   }) async {
-    final url = '$baseUrl/teacher/modify/$teacherId/';
+    final url = '${AppUrls.modifyTeacherProfileUrl}$teacherId/';
 
     try {
       var dio = Dio();
@@ -377,8 +379,7 @@ class ProfileRepository {
   // Fetch subject categories and their subjects
   Future<List<Map<String, dynamic>>> fetchSubjectCategories(
       String accessToken) async {
-    final url =
-        Uri.parse('https://api.mwalimufinder.com/api/v1/subjects/categories/');
+    final url = Uri.parse('${AppUrls.baseUrl}/subjects/categories/');
 
     try {
       final response = await http.get(
@@ -429,8 +430,7 @@ class ProfileRepository {
     final userId =
         userData['user_id']; // Get the user ID (360) from the fetched data
 
-    final url = Uri.parse(
-        'https://api.mwalimufinder.com/api/v1/payments/user/methods/');
+    final url = Uri.parse(AppUrls.paymentMethodsUrl);
 
     // Create the request body
     final body = jsonEncode({
@@ -488,8 +488,7 @@ class ProfileRepository {
 
   Future<List<Map<String, dynamic>>> fetchPaymentMethods(
       String accessToken) async {
-    final url = Uri.parse(
-        'https://api.mwalimufinder.com/api/v1/payments/user/methods/');
+    final url = Uri.parse(AppUrls.paymentMethodsUrl);
 
     try {
       // Print request details
@@ -508,9 +507,9 @@ class ProfileRepository {
       );
 
       // Print response details
-      print("Status Code: \${response.statusCode}");
-      print("Response Headers: \${response.headers}");
-      print("Response Body: \${response.body}");
+      print("Status Code: ${response.statusCode}");
+      print("Response Headers: ${response.headers}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
@@ -550,8 +549,8 @@ class ProfileRepository {
 
     final userId = userData['user_id'];
 
-    final url = Uri.parse(
-        'https://api.mwalimufinder.com/api/v1/payments/user/methods/modify/$paymentMethodId/');
+    final url =
+        Uri.parse('${AppUrls.paymentMethodsUrl}modify/$paymentMethodId/');
 
     final body = jsonEncode({
       if (title != null) 'title': title,
@@ -586,8 +585,8 @@ class ProfileRepository {
   // Delete payment method
   Future<bool> deletePaymentMethod(
       String accessToken, String paymentMethodId) async {
-    final url = Uri.parse(
-        'https://api.mwalimufinder.com/api/v1/payments/user/methods/modify/$paymentMethodId/');
+    final url =
+        Uri.parse('${AppUrls.paymentMethodsUrl}modify/$paymentMethodId/');
 
     try {
       final response = await http.delete(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/home/home_screen/screens/home_screen.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/profile_details_provider.dart';
 import 'package:we_teach/presentation/features/live_profile/screens/public_payment_screen.dart';
@@ -82,7 +83,7 @@ class _TeacherLiveProfileScreenState extends State<TeacherLiveProfileScreen> {
           Row(
             children: [
               SvgPicture.asset(
-                'assets/svg/profile-live.svg',
+                Assets.svg.profileLive, // Use the generated asset class
                 width: 16,
                 height: 16,
               ),
@@ -212,8 +213,9 @@ class _TeacherLiveProfileScreenState extends State<TeacherLiveProfileScreen> {
                       children: [
                         SvgPicture.asset(
                           isProfileLive
-                              ? "assets/svg/blue_circle.svg"
-                              : "assets/svg/ellipse.svg",
+                              ? Assets.svg
+                                  .blueCircle // Use the generated asset class
+                              : Assets.svg.ellipse,
                           width: 120,
                           height: 120,
                         ),
@@ -222,7 +224,8 @@ class _TeacherLiveProfileScreenState extends State<TeacherLiveProfileScreen> {
                             bottom: 12,
                             right: 12,
                             child: SvgPicture.asset(
-                              'assets/svg/blue_dot.svg',
+                              Assets
+                                  .svg.blueDot, // Use the generated asset class
                               width: 12,
                               height: 12,
                             ),
@@ -233,7 +236,7 @@ class _TeacherLiveProfileScreenState extends State<TeacherLiveProfileScreen> {
                       child: Image(
                         image: provider.userData?['image'] != null
                             ? NetworkImage(provider.userData!['image'])
-                            : const AssetImage("assets/images/man.png")
+                            : AssetImage(Assets.images.man.path)
                                 as ImageProvider,
                         width: 96,
                         height: 96,

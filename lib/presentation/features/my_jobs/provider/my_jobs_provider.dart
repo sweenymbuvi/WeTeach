@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:we_teach/data/repositories/auth/my_jobs_repo.dart';
+import 'package:we_teach/data/repositories/my_jobs/my_jobs_repo.dart';
 import 'dart:async';
 
 class MyJobsProvider with ChangeNotifier {

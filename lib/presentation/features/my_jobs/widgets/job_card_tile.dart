@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'dart:ui';
 import 'package:we_teach/presentation/features/my_jobs/provider/my_jobs_provider.dart';
 import 'package:we_teach/presentation/features/jobs/screens/job_details_screen.dart';
@@ -142,7 +143,7 @@ class JobCardTile extends StatelessWidget {
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           return Image.asset(
-            "assets/images/app_icon.png",
+            Assets.images.appIcon.path, // Use the generated asset class
             width: 40,
             height: 40,
             fit: BoxFit.cover,

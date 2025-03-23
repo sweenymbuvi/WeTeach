@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/notifications/provider/notifications_provider.dart';
 import 'package:we_teach/presentation/shared/widgets/bottom_nav_bar.dart';
 import '../widgets/notification_tile.dart';
@@ -58,7 +59,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onTapDown: (details) =>
                   _showNotificationOptions(context, details),
               child: SvgPicture.asset(
-                'assets/svg/more.svg',
+                Assets.svg.more, // Use the generated asset class
                 width: 40,
                 height: 40,
               ),

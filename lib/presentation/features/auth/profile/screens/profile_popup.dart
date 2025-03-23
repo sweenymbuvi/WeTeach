@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Add this package to your pubspec.yaml
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/profile/widgets/profile_button.dart';
 import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
 import 'package:we_teach/presentation/features/profile/manage_profile/screens/manage_profile_screen.dart';
@@ -60,7 +61,8 @@ class _ProfilePopupState extends State<ProfilePopup> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Image.asset(
-                        'assets/images/pana.png',
+                        Assets
+                            .images.pana.path, // Use the generated asset class
                         height: 100,
                       ),
                     ),

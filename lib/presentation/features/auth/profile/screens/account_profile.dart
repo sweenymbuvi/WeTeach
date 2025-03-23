@@ -3,6 +3,7 @@ import 'package:intl_phone_field/phone_number.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/auth/profile/screens/add_profile_pic.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -193,7 +194,7 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                       buildTextField(
                         hintText: 'Enter name',
                         prefixIcon: SvgPicture.asset(
-                          'assets/svg/user.svg',
+                          Assets.svg.user, // Use the generated asset class
                           height: screenWidth * 0.06,
                           width: screenWidth * 0.06,
                         ),
@@ -284,7 +285,8 @@ class _AccountProfileScreenState extends State<AccountProfileScreen> {
                           prefixIcon: Padding(
                             padding: const EdgeInsets.all(12),
                             child: SvgPicture.asset(
-                              'assets/svg/school.svg',
+                              Assets
+                                  .svg.school, // Use the generated asset class
                               height: screenWidth * 0.06,
                               width: screenWidth * 0.06,
                             ),

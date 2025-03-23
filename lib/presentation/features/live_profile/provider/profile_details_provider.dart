@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:we_teach/data/repositories/auth/live_profile_repo.dart';
+import 'package:we_teach/data/repositories/live_profile/live_profile_repo.dart';
 
 class ProfileDetailsProvider with ChangeNotifier {
   final LiveProfileRepository _repository = LiveProfileRepository();

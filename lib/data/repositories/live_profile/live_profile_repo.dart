@@ -1,19 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:we_teach/constants/app_urls.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
 class LiveProfileRepository {
   final Dio _dio = Dio();
   final SecureStorageService _secureStorage = SecureStorageService();
-  final String _userDataUrl =
-      "https://api.mwalimufinder.com/api/v1/users/teacher/";
-  final String _postTeacherProfileUrl =
-      "https://api.mwalimufinder.com/api/v1/jobs/teacher/profile/user/";
-  final String _makeProfileLiveUrl =
-      "https://api.mwalimufinder.com/api/v1/payments/mpesa/profile/make/";
-  final String _checkPaymentStatusUrl =
-      "https://api.mwalimufinder.com/api/v1/payments/mpesa/confirm/";
-  final String _deleteTeacherProfilePostUrl =
-      "https://api.mwalimufinder.com/api/v1/jobs/teacher/profile/modify/"; // Base URL for delete
+
+  // Use the URLs from AppUrls
+  final String _userDataUrl = AppUrls.getTeacherDetails;
+  final String _postTeacherProfileUrl = AppUrls.postTeacherProfile;
+  final String _makeProfileLiveUrl = AppUrls.makeProfileLive;
+  final String _checkPaymentStatusUrl = AppUrls.checkPaymentStatus;
+  final String _deleteTeacherProfilePostUrl = AppUrls.deleteTeacherProfilePost;
 
   Future<Map<String, dynamic>?> fetchUserData() async {
     try {
@@ -232,7 +230,7 @@ class LiveProfileRepository {
       }
 
       final response = await _dio.get(
-        '$_checkPaymentStatusUrl$paymentId/',
+        '${_checkPaymentStatusUrl}$paymentId/',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',

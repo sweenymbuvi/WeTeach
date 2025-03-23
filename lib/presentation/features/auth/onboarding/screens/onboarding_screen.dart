@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/auth/welcome/screens/welcome_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -30,8 +31,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              'assets/images/app_icon.png',
+            // Use the generated asset class to load the image
+            Assets.images.appIcon.image(
               height: 150,
               width: 150,
             ),

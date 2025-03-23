@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:we_teach/constants/app_urls.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
-class ViewSchoolRepository {
+class ViewJobRepository {
   final Dio _dio = Dio();
   final SecureStorageService _secureStorageService = SecureStorageService();
-  final String baseUrl =
-      "https://api.mwalimufinder.com/api/v1/users/school/photos/get/";
 
-  Future<List<Map<String, dynamic>>?> fetchSchoolPhotos(int schoolId) async {
+  Future<Map<String, dynamic>?> fetchJobDetails(int jobId) async {
     try {
       // Retrieve access token
       String? accessToken = await _secureStorageService.getAccessToken();
@@ -17,19 +16,19 @@ class ViewSchoolRepository {
 
       // Send GET request with headers
       Response response = await _dio.get(
-        "$baseUrl$schoolId",
+        "${AppUrls.viewJobUrl}$jobId",
         options: Options(
           headers: {"Authorization": "Bearer $accessToken"},
         ),
       );
 
       if (response.statusCode == 200) {
-        return List<Map<String, dynamic>>.from(response.data);
+        return response.data;
       } else {
-        throw Exception("Failed to load school photos");
+        throw Exception("Failed to load job details");
       }
     } catch (e) {
-      print("Error fetching school photos: $e");
+      print("Error fetching job details: $e");
       return null;
     }
   }

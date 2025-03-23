@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/profile_details_provider.dart';
 
 class TeacherLocationSection extends StatelessWidget {
@@ -21,8 +22,10 @@ class TeacherLocationSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle("Teacher's Location"),
-        _locationItem("assets/svg/location.svg", "County: $county"),
-        _locationItem("assets/svg/location.svg", "Sub-county: $subCounty"),
+        _locationItem(Assets.svg.location,
+            "County: $county"), // Use the generated asset class
+        _locationItem(Assets.svg.location,
+            "Sub-county: $subCounty"), // Use the generated asset class
       ],
     );
   }

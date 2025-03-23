@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 
 class PasswordField extends StatelessWidget {
   final TextEditingController
@@ -37,7 +38,7 @@ class PasswordField extends StatelessWidget {
         prefixIcon: Padding(
           padding: const EdgeInsets.all(12.0),
           child: SvgPicture.asset(
-            'assets/svg/lock.svg',
+            Assets.svg.lock, // Use the generated asset class
             height: 20, // Adjusted lock icon size
             width: 20,
             fit: BoxFit.scaleDown,

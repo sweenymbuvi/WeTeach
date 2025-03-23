@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
@@ -91,8 +92,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       hintStyle: TextStyle(color: Color(0xFF828282)),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: SvgPicture.asset('assets/svg/email.svg',
-                            height: 5, width: 5, fit: BoxFit.scaleDown),
+                        child: SvgPicture.asset(
+                          Assets.svg.email, // Use the generated asset class
+                          height: 5,
+                          width: 5,
+                          fit: BoxFit.scaleDown,
+                        ),
                       ),
                       fillColor: Color(0xFFFDFDFF),
                       filled: true,
@@ -305,7 +310,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             // Handle "Continue with Google"
                           },
                           icon: Image.asset(
-                            'assets/images/google_icon.png',
+                            Assets.images.googleIcon
+                                .path, // Use the generated asset class
                             height: 20,
                           ),
                           label: Text(

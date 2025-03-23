@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:we_teach/constants/app_urls.dart';
 
 class HomeRepository {
-  final String baseUrl = "https://api.mwalimufinder.com/api/v1/users/";
-  final String jobsBaseUrl = "https://api.mwalimufinder.com/api/v1/jobs/";
+  // Use the URLs from AppUrls
+  final String baseUrl = AppUrls.getTeacherDetails;
+  final String jobsBaseUrl = AppUrls.jobsBaseUrl;
 
   // Fetch user data
   Future<Map<String, dynamic>?> fetchUserData(String accessToken) async {
-    final url = Uri.parse('$baseUrl/teacher/');
+    final url = Uri.parse(baseUrl);
 
     try {
       // Print request details
@@ -117,7 +119,7 @@ class HomeRepository {
         url,
         headers: {
           'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json', // Fixed syntax error here
+          'Content-Type': 'application/json',
         },
       );
 
@@ -261,9 +263,9 @@ class HomeRepository {
     }
   }
 
-// Save job method
+  // Save job method
   Future<bool> saveJob(int userId, int jobId, String accessToken) async {
-    final url = Uri.parse('$jobsBaseUrl/saves/');
+    final url = Uri.parse('${jobsBaseUrl}saves/');
 
     try {
       print("Sending API Request to: $url");

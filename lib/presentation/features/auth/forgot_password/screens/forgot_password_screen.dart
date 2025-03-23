@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/otp_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -139,8 +140,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     decoration: InputDecoration(
                       hintText: "peternjenga@glitex.com",
                       hintStyle: TextStyle(color: Color(0xFF828282)),
-                      prefixIcon: SvgPicture.asset('assets/svg/email.svg',
-                          height: 5, width: 5, fit: BoxFit.scaleDown),
+                      prefixIcon: SvgPicture.asset(
+                        Assets.svg
+                            .email, // Use the generated asset class to load the SVG
+                        height: 20, // Adjusted height for better visibility
+                        width: 20, // Adjusted width for better visibility
+                        fit: BoxFit.scaleDown,
+                      ),
                       fillColor: Color(0xFFFDFDFF),
                       filled: true,
                       border: OutlineInputBorder(

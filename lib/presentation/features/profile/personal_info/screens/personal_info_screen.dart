@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/profile/personal_info/provider/personal_info_provider.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/text_field.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/action_buttons.dart';
@@ -224,8 +225,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             padding: const EdgeInsets.only(right: 16.0, top: 10),
             child: GestureDetector(
               onTap: _pickImage,
-              child: SvgPicture.asset('assets/svg/edit.svg',
-                  height: 40, width: 40),
+              child: SvgPicture.asset(
+                  Assets.svg.edit, // Use the generated asset class
+                  height: 40,
+                  width: 40),
             ),
           ),
         ],
@@ -240,8 +243,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   SizedBox(height: 20),
                   Stack(
                     children: [
-                      SvgPicture.asset('assets/svg/ellipse.svg',
-                          height: 120, width: 120, fit: BoxFit.cover),
+                      SvgPicture.asset(
+                          Assets.svg.ellipse, // Use the generated asset class
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.cover),
                       Positioned.fill(
                         child: Align(
                           alignment: Alignment.center,
@@ -269,8 +275,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                           backgroundColor: Colors.white,
                           child: GestureDetector(
                             onTap: _pickImage,
-                            child: SvgPicture.asset('assets/svg/edit.svg',
-                                height: 30, width: 30),
+                            child: SvgPicture.asset(
+                                Assets
+                                    .svg.edit, // Use the generated asset class
+                                height: 30,
+                                width: 30),
                           ),
                         ),
                       ),

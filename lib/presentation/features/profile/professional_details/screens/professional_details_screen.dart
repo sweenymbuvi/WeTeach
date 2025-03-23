@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/action_buttons.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/profile_card.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/text_field.dart';
@@ -223,9 +224,9 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
             padding: const EdgeInsets.only(right: 16.0, top: 10),
             child: IconButton(
               icon: SvgPicture.asset(
-                'assets/svg/edit.svg',
-                height: 40,
-                width: 40,
+                Assets.svg.edit, // Use the generated asset class
+                height: 24,
+                width: 24,
               ),
               onPressed: () {},
             ),
@@ -360,7 +361,8 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
                                 // Add Subject Icon Button at the start
                                 IconButton(
                                   icon: SvgPicture.asset(
-                                    'assets/svg/edit.svg',
+                                    Assets.svg
+                                        .edit, // Use the generated asset class
                                     height: 24,
                                     width: 24,
                                   ),

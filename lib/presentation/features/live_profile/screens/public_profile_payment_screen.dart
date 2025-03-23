@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/live_profile_provider.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/profile_details_provider.dart';
 import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
@@ -396,7 +397,7 @@ class ProfilePublicityPaymentSheet {
               ),
               const SizedBox(height: 24),
               Image.asset(
-                'assets/images/success.gif',
+                Assets.images.success.path, // Use the generated asset class
                 width: 100,
                 height: 100,
                 fit: BoxFit.cover,

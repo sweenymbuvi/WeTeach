@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:we_teach/constants/constants.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/my_jobs/screens/my_jobs_screen.dart';
 import 'package:we_teach/presentation/features/school/provider/view_school_provider.dart';
 import 'package:we_teach/presentation/features/school/widgets/about_school_section.dart';
@@ -130,7 +131,8 @@ class _ViewSchoolScreenState extends State<ViewSchoolScreen> {
         ),
         actions: [
           IconButton(
-            icon: SvgPicture.asset("assets/svg/share_school.svg"),
+            icon: SvgPicture.asset(
+                Assets.svg.shareSchool), // Use the generated asset class
             onPressed: onShareClicked,
           ),
         ],
@@ -148,8 +150,11 @@ class _ViewSchoolScreenState extends State<ViewSchoolScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    SvgPicture.asset("assets/svg/ellipse.svg",
-                        width: 120, height: 120),
+                    SvgPicture.asset(
+                      Assets.svg.ellipse, // Use the generated asset class
+                      width: 120,
+                      height: 120,
+                    ),
                     ClipOval(
                       child: Image.network(
                         imageUrl,

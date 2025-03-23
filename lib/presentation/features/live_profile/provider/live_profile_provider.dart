@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:we_teach/data/repositories/auth/payment_repo.dart';
+import 'package:we_teach/data/repositories/payment/payment_repo.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 
 class LiveProfileProvider with ChangeNotifier {

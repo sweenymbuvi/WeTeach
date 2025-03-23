@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/live_profile/provider/profile_details_provider.dart';
 import 'package:we_teach/presentation/features/live_profile/screens/teacher_profile_screen.dart';
 
@@ -109,7 +110,7 @@ class _ProfileStatusCardState extends State<ProfileStatusCard> {
         Row(
           children: [
             SvgPicture.asset(
-              'assets/svg/profile-live.svg',
+              Assets.svg.profileLive, // Use the generated asset class
               width: 16,
               height: 16,
             ),
@@ -203,7 +204,7 @@ class _ProfileStatusCardState extends State<ProfileStatusCard> {
             ],
           ),
           child: SvgPicture.asset(
-            'assets/svg/plane.svg',
+            Assets.svg.plane, // Use the generated asset class
             height: 40,
             width: 40,
             colorFilter: const ColorFilter.mode(

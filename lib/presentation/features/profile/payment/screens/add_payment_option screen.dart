@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/profile/payment/screens/card_payment_screen.dart';
 import 'package:we_teach/presentation/features/profile/payment/screens/mpesa_payment_screen.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/payment_card.dart';
@@ -40,7 +41,7 @@ class AddPaymentOptionsScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16.0, top: 10),
             child: SvgPicture.asset(
-              'assets/svg/add.svg', // Replace with your actual SVG asset path
+              Assets.svg.add, // Use the generated asset class for add icon
               height: 40,
               width: 40,
             ),
@@ -62,8 +63,8 @@ class AddPaymentOptionsScreen extends StatelessWidget {
             ),
             SizedBox(height: 16),
             PaymentOptionCard(
-              logo:
-                  'assets/images/mpesa.png', // Replace with your M-Pesa logo path
+              logo: Assets.images.mpesa
+                  .path, // Use the generated asset class for M-Pesa logo
               title: 'Mpesa',
               subtitle: 'Edit your Mpesa number',
               onTap: () {
@@ -78,8 +79,8 @@ class AddPaymentOptionsScreen extends StatelessWidget {
             ),
             SizedBox(height: 16),
             PaymentOptionCard(
-              logo:
-                  'assets/images/visa.png', // Replace with your Visa/Mastercard logo path
+              logo: Assets.images.visa
+                  .path, // Use the generated asset class for Visa/Mastercard logo
               title: 'Bank Card',
               subtitle: 'Add your bank card to pay from bank account',
               onTap: () {

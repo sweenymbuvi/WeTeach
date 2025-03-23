@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 
 class NotificationOptions extends StatelessWidget {
   final VoidCallback onMarkAsRead;
@@ -24,13 +25,15 @@ class NotificationOptions extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildOption(
-            iconPath: 'assets/svg/envelope_open.svg',
+            iconPath:
+                Assets.svg.envelopeOpen, // Use the generated asset class',
             text: "Mark selected as read",
             onTap: onMarkAsRead,
           ),
           const SizedBox(height: 10),
           _buildOption(
-            iconPath: 'assets/svg/envelope_closed.svg',
+            iconPath:
+                Assets.svg.envelopeClosed, // Use the generated asset class
             text: "Mark selected as unread",
             onTap: onMarkAsUnread,
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/forgot_password/screens/forgot_password_screen.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_number.dart';
 import 'package:we_teach/presentation/features/auth/signup/provider/auth_provider.dart';
@@ -103,7 +104,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: SvgPicture.asset(
-                                'assets/svg/email.svg',
+                                Assets
+                                    .svg.email, // Use the generated asset class
                                 height: 5,
                                 width: 5,
                                 fit: BoxFit.scaleDown,
@@ -163,7 +165,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: SvgPicture.asset(
-                                'assets/svg/lock.svg',
+                                Assets
+                                    .svg.lock, // Use the generated asset class
                                 height: 5,
                                 width: 5,
                                 fit: BoxFit.scaleDown,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/search/provider/job_search_provider.dart';
 import 'package:we_teach/presentation/features/profile/shared/widgets/action_buttons.dart';
 
@@ -103,7 +104,7 @@ class _TeacherSearchBottomSheetState extends State<TeacherSearchBottomSheet> {
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: SvgPicture.asset(
-                      'assets/svg/lens.svg',
+                      Assets.svg.lens, // Use the generated asset class
                       width: 20,
                       height: 20,
                     ),

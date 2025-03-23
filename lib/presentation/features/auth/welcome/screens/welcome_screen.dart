@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
 import 'package:we_teach/presentation/shared/widgets/my_button.dart';
@@ -63,7 +64,8 @@ class WelcomeScreen extends StatelessWidget {
                           Expanded(
                             child: StatWidget(
                               iconPath: SvgPicture.asset(
-                                'assets/svg/school.svg',
+                                Assets.svg
+                                    .school, // Use the generated asset class
                                 height: 24.0,
                               ),
                               value: '4,004',
@@ -74,7 +76,8 @@ class WelcomeScreen extends StatelessWidget {
                           Expanded(
                             child: StatWidget(
                               iconPath: SvgPicture.asset(
-                                'assets/svg/briefcase.svg',
+                                Assets.svg
+                                    .briefcase, // Use the generated asset class
                                 height: 24.0,
                               ),
                               value: '24,804',
@@ -84,7 +87,6 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      const SizedBox(width: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment
                             .spaceEvenly, // Push content to the right
@@ -92,7 +94,8 @@ class WelcomeScreen extends StatelessWidget {
                           Expanded(
                             child: StatWidget(
                               iconPath: SvgPicture.asset(
-                                'assets/svg/user.svg',
+                                Assets
+                                    .svg.user, // Use the generated asset class
                                 height: 24.0,
                               ),
                               value: '16,288',
@@ -103,7 +106,8 @@ class WelcomeScreen extends StatelessWidget {
                           Expanded(
                             child: StatWidget(
                               iconPath: SvgPicture.asset(
-                                'assets/svg/handshake.svg',
+                                Assets.svg
+                                    .handshake, // Use the generated asset class
                                 height: 24.0,
                               ),
                               value: '22,012',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart'; // Import the generated assets file
 import 'package:we_teach/presentation/features/jobs/provider/view_job_provider.dart';
 import 'package:we_teach/presentation/features/school/screens/view_school_screen.dart';
 
@@ -64,7 +65,7 @@ class SchoolInfoCard extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 SvgPicture.asset(
-                  "assets/svg/ellipse.svg",
+                  Assets.svg.ellipse, // Use the generated asset class
                   height: 48,
                   width: 48,
                 ),
@@ -114,7 +115,7 @@ class SchoolInfoCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             SvgPicture.asset(
-              "assets/svg/arrow.svg",
+              Assets.svg.arrow, // Use the generated asset class
               height: 16,
               width: 16,
             ),

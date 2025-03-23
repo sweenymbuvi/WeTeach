@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:we_teach/gen/assets.gen.dart';
 import 'package:we_teach/presentation/features/auth/signup/screens/create_account_screen.dart';
 import 'package:we_teach/services/secure_storage_service.dart';
 import 'package:we_teach/presentation/features/auth/signin/screens/signin_screen.dart';
@@ -306,7 +307,8 @@ class _SignupNumberScreenState extends State<SignupNumberScreen> {
                           // Handle "Continue with Google"
                         },
                         icon: Image.asset(
-                          'assets/images/google_icon.png',
+                          Assets.images.googleIcon
+                              .path, // Use the generated asset class
                           height: 20,
                         ),
                         label: Text(
